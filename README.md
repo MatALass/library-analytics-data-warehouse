@@ -5,7 +5,7 @@ Projet Power BI basé sur un modèle en étoile pour analyser l'activité d'un r
 ## Structure
 
 ```text
-PowerBI_EDW_Library_Project/
+library-analytics-data-warehouse/
 ├── 00_modele_commun/
 ├── 01_data_csv/
 ├── 02_mesures_dax/
