@@ -1,0 +1,10 @@
+﻿category_id,category,subcategory,discipline_cluster,Category,Subcategory
+1,Data Science & IA,Machine Learning,Numérique,Data Science & IA,Machine Learning
+2,Business Intelligence,Power BI / Reporting,Numérique,Business Intelligence,Power BI / Reporting
+3,Data Engineering,ETL / Data Warehouse,Numérique,Data Engineering,ETL / Data Warehouse
+4,Statistiques,Analyse quantitative,Numérique,Statistiques,Analyse quantitative
+5,Droit,Droit public / privé,Sciences sociales,Droit,Droit public / privé
+6,Santé,Médecine / Santé publique,Santé,Santé,Médecine / Santé publique
+7,Économie-Gestion,Finance / Management,Gestion,Économie-Gestion,Finance / Management
+8,Sciences Humaines,Sociologie / Psychologie,Sciences sociales,Sciences Humaines,Sociologie / Psychologie
+9,Littérature,Romans / essais,Lettres,Littérature,Romans / essais

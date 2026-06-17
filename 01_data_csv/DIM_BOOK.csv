@@ -1,0 +1,73 @@
+﻿book_id,isbn,title,author,category_id,category,genre,academic_level,language,publication_year,demand_tier,base_total_copies,book_count,popularity_score,total_copies,available_copies,active_loans,utilization_rate,availability_rate,out_of_stock_global,Category,Author Count
+1,978-2-010001-754-1,Python pour la Data Analyse,Nadia Lefèvre,1,Data Science & IA,Machine Learning,Master,French,2024,top,34,1,6.27,56,0,56,1.0,0.0,True,Data Science & IA,1
+2,978-2-010002-125-4,Machine Learning Appliqué,Karim Benali,1,Data Science & IA,Machine Learning,Master,French,2023,top,34,1,6.27,48,0,48,1.0,0.0,True,Data Science & IA,1
+3,978-2-010003-350-3,Deep Learning Pratique,Claire Martin,1,Data Science & IA,Machine Learning,Doctorate,French,2022,high,24,1,3.63,67,12,55,0.8209,0.1791,False,Data Science & IA,1
+4,978-2-010004-242-1,IA Générative et Applications,Thomas Bernard,1,Data Science & IA,Machine Learning,Master,French,2025,top,34,1,6.27,50,0,50,1.0,0.0,True,Data Science & IA,1
+5,978-2-010005-792-8,Fondamentaux de la Science des Données,Sophie Durand,1,Data Science & IA,Machine Learning,Undergraduate,French,2021,high,24,1,3.63,68,11,57,0.8382,0.1618,False,Data Science & IA,1
+6,978-2-010006-189-9,NLP pour Analystes,Mehdi Amrani,1,Data Science & IA,Machine Learning,Master,French,2020,medium,16,1,1.65,69,34,35,0.5072,0.4928,False,Data Science & IA,1
+7,978-2-010007-532-0,Computer Vision Essentials,Emma Collins,1,Data Science & IA,Machine Learning,Master,English,2022,medium,16,1,1.65,70,37,33,0.4714,0.5286,False,Data Science & IA,1
+8,978-2-010008-130-1,Éthique de l’Intelligence Artificielle,Luc Moreau,1,Data Science & IA,Machine Learning,Doctorate,French,2021,medium,16,1,1.65,66,36,30,0.4545,0.5455,False,Data Science & IA,1
+9,978-2-020009-323-3,Power BI Avancé,Raphaël Dubois,2,Business Intelligence,Power BI / Reporting,Master,French,2024,top,34,1,5.51,50,0,50,1.0,0.0,True,Business Intelligence,1
+10,978-2-020010-617-9,Tableaux de Bord Décisionnels,Julie Mercier,2,Business Intelligence,Power BI / Reporting,Undergraduate,French,2022,high,24,1,3.19,70,12,58,0.8286,0.1714,False,Business Intelligence,1
+11,978-2-020011-127-8,DAX Patterns pour BI,Marco Ricci,2,Business Intelligence,Power BI / Reporting,Master,English,2023,top,34,1,5.51,47,0,47,1.0,0.0,True,Business Intelligence,1
+12,978-2-020012-303-8,Modélisation en Étoile,Anne Petit,2,Business Intelligence,Power BI / Reporting,Undergraduate,French,2021,high,24,1,3.19,64,11,53,0.8281,0.1719,False,Business Intelligence,1
+13,978-2-020013-529-3,Storytelling avec les Données,Laura Simon,2,Business Intelligence,Power BI / Reporting,Undergraduate,French,2020,medium,16,1,1.45,67,34,33,0.4925,0.5075,False,Business Intelligence,1
+14,978-2-020014-559-9,Self-Service BI Governance,Peter Novak,2,Business Intelligence,Power BI / Reporting,Master,English,2022,medium,16,1,1.45,63,31,32,0.5079,0.4921,False,Business Intelligence,1
+15,978-2-020015-384-0,Power Query en Pratique,Mina Haddad,2,Business Intelligence,Power BI / Reporting,Master,French,2023,high,24,1,3.19,68,13,55,0.8088,0.1912,False,Business Intelligence,1
+16,978-2-020016-877-2,KPI et Pilotage Opérationnel,Marc Fontaine,2,Business Intelligence,Power BI / Reporting,Undergraduate,French,2019,medium,16,1,1.45,71,38,33,0.4648,0.5352,False,Business Intelligence,1
+17,978-2-030017-814-6,SQL pour l’Entrepôt de Données,Samuel Laurent,3,Data Engineering,ETL / Data Warehouse,Undergraduate,French,2023,top,34,1,5.89,47,0,47,1.0,0.0,True,Data Engineering,1
+18,978-2-030018-448-4,Data Warehouse & OLAP,Élodie Garnier,3,Data Engineering,ETL / Data Warehouse,Master,French,2022,top,34,1,5.89,56,0,56,1.0,0.0,True,Data Engineering,1
+19,978-2-030019-259-3,ETL Moderne avec Python,Nora Fischer,3,Data Engineering,ETL / Data Warehouse,Master,French,2024,top,34,1,5.89,45,0,45,1.0,0.0,True,Data Engineering,1
+20,978-2-030020-881-5,Architecture Lakehouse,Victor Nguyen,3,Data Engineering,ETL / Data Warehouse,Master,French,2025,high,24,1,3.41,73,11,62,0.8493,0.1507,False,Data Engineering,1
+21,978-2-030021-204-1,Qualité des Données,Hugo Robert,3,Data Engineering,ETL / Data Warehouse,Master,French,2021,medium,16,1,1.55,65,34,31,0.4769,0.5231,False,Data Engineering,1
+22,978-2-030022-489-1,Pipelines Cloud Analytics,Oliver Smith,3,Data Engineering,ETL / Data Warehouse,Master,English,2022,medium,16,1,1.55,67,31,36,0.5373,0.4627,False,Data Engineering,1
+23,978-2-030023-467-5,DataOps et Industrialisation,Inès Caron,3,Data Engineering,ETL / Data Warehouse,Doctorate,French,2023,medium,16,1,1.55,66,33,33,0.5,0.5,False,Data Engineering,1
+24,978-2-030024-718-4,Bases NoSQL pour Analytics,Yann Muller,3,Data Engineering,ETL / Data Warehouse,Undergraduate,French,2020,medium,16,1,1.55,64,33,31,0.4844,0.5156,False,Data Engineering,1
+25,978-2-040025-926-0,Statistiques pour Data Science,Mathieu Perrin,4,Statistiques,Analyse quantitative,Undergraduate,French,2023,top,34,1,4.37,52,0,52,1.0,0.0,True,Statistiques,1
+26,978-2-040026-847-7,Probabilités Appliquées,Sarah Cohen,4,Statistiques,Analyse quantitative,Undergraduate,French,2021,high,24,1,2.53,66,12,54,0.8182,0.1818,False,Statistiques,1
+27,978-2-040027-649-1,Économétrie avec R,Alice Fournier,4,Statistiques,Analyse quantitative,Master,French,2020,medium,16,1,1.15,63,30,33,0.5238,0.4762,False,Statistiques,1
+28,978-2-040028-487-1,Méthodes Bayésiennes,David Klein,4,Statistiques,Analyse quantitative,Doctorate,English,2022,medium,16,1,1.15,60,29,31,0.5167,0.4833,False,Statistiques,1
+29,978-2-040029-665-4,Analyse Multivariée,Camille Roy,4,Statistiques,Analyse quantitative,Master,French,2019,medium,16,1,1.15,65,34,31,0.4769,0.5231,False,Statistiques,1
+30,978-2-040030-949-9,Tests Statistiques Pratiques,Olivier Faure,4,Statistiques,Analyse quantitative,Undergraduate,French,2021,medium,16,1,1.15,63,32,31,0.4921,0.5079,False,Statistiques,1
+31,978-2-040031-982-5,Time Series Forecasting,Grace Lee,4,Statistiques,Analyse quantitative,Master,English,2023,medium,16,1,1.15,64,32,32,0.5,0.5,False,Statistiques,1
+32,978-2-040032-691-3,Plans d’Expérience,Martin Vidal,4,Statistiques,Analyse quantitative,Doctorate,French,2018,low,12,1,0.402,89,74,15,0.1685,0.8315,False,Statistiques,1
+33,978-2-050033-821-1,Code Civil Commenté,Jean Marchand,5,Droit,Droit public / privé,Undergraduate,French,2024,high,24,1,1.87,64,15,49,0.7656,0.2344,False,Droit,1
+34,978-2-050034-146-3,Droit Administratif,Pauline Chevalier,5,Droit,Droit public / privé,Undergraduate,French,2022,medium,16,1,0.85,64,33,31,0.4844,0.5156,False,Droit,1
+35,978-2-050035-891-4,Droit Européen des Données,Antoine Weber,5,Droit,Droit public / privé,Master,French,2023,high,24,1,1.87,61,13,48,0.7869,0.2131,False,Droit,1
+36,978-2-050036-181-3,Propriété Intellectuelle Numérique,Mélanie Blanc,5,Droit,Droit public / privé,Master,French,2021,medium,16,1,0.85,67,32,35,0.5224,0.4776,False,Droit,1
+37,978-2-050037-987-1,Institutions Juridiques,Michel André,5,Droit,Droit public / privé,Undergraduate,French,2019,medium,16,1,0.85,62,32,30,0.4839,0.5161,False,Droit,1
+38,978-2-050038-489-4,Contrats et Responsabilité,Carole Meunier,5,Droit,Droit public / privé,Master,French,2020,medium,16,1,0.85,69,37,32,0.4638,0.5362,False,Droit,1
+39,978-2-050039-564-5,Droit de la Santé,Hélène Roche,5,Droit,Droit public / privé,Master,French,2021,medium,16,1,0.85,68,38,30,0.4412,0.5588,False,Droit,1
+40,978-2-050040-266-5,Legal Tech et Compliance,Eva Romano,5,Droit,Droit public / privé,Master,French,2024,high,24,1,1.87,65,12,53,0.8154,0.1846,False,Droit,1
+41,978-2-060041-463-3,Santé Publique et Données,Dr. Anaïs Leroux,6,Santé,Médecine / Santé publique,Master,French,2023,high,24,1,1.65,74,16,58,0.7838,0.2162,False,Santé,1
+42,978-2-060042-786-4,Épidémiologie Pratique,Dr. Malik Saïd,6,Santé,Médecine / Santé publique,Master,French,2022,high,24,1,1.65,68,16,52,0.7647,0.2353,False,Santé,1
+43,978-2-060043-818-1,Anatomie Fonctionnelle,Dr. Chloé Renard,6,Santé,Médecine / Santé publique,Undergraduate,French,2020,medium,16,1,0.75,66,36,30,0.4545,0.5455,False,Santé,1
+44,978-2-060044-723-2,Biostatistique Médicale,Dr. Henry Wilson,6,Santé,Médecine / Santé publique,Master,English,2021,medium,16,1,0.75,74,36,38,0.5135,0.4865,False,Santé,1
+45,978-2-060045-646-3,Gestion Hospitalière,Dr. Laura Petit,6,Santé,Médecine / Santé publique,Master,French,2019,low,12,1,0.262,85,72,13,0.1529,0.8471,False,Santé,1
+46,978-2-060046-267-7,Santé Numérique,Dr. Sofia Garcia,6,Santé,Médecine / Santé publique,Master,French,2024,medium,16,1,0.75,72,38,34,0.4722,0.5278,False,Santé,1
+47,978-2-060047-488-4,Recherche Clinique,Dr. Bernard Masson,6,Santé,Médecine / Santé publique,Doctorate,French,2022,medium,16,1,0.75,66,37,29,0.4394,0.5606,False,Santé,1
+48,978-2-060048-755-8,Prévention et Politiques de Santé,Dr. Inès Morel,6,Santé,Médecine / Santé publique,Undergraduate,French,2020,low,12,1,0.262,92,77,15,0.163,0.837,False,Santé,1
+49,978-2-070049-324-5,Finance d’Entreprise,Alexandre Noël,7,Économie-Gestion,Finance / Management,Undergraduate,French,2021,medium,16,1,0.65,63,34,29,0.4603,0.5397,False,Économie-Gestion,1
+50,978-2-070050-963-0,Contrôle de Gestion,Béatrice Collet,7,Économie-Gestion,Finance / Management,Undergraduate,French,2020,medium,16,1,0.65,66,31,35,0.5303,0.4697,False,Économie-Gestion,1
+51,978-2-070051-334-0,Marketing Analytics,Camila Rossi,7,Économie-Gestion,Finance / Management,Master,French,2023,high,24,1,1.43,71,10,61,0.8592,0.1408,False,Économie-Gestion,1
+52,978-2-070052-924-5,Management des SI,Pierre Klein,7,Économie-Gestion,Finance / Management,Master,French,2022,medium,16,1,0.65,61,32,29,0.4754,0.5246,False,Économie-Gestion,1
+53,978-2-070053-510-4,Comptabilité Avancée,Nicolas Girard,7,Économie-Gestion,Finance / Management,Undergraduate,French,2019,low,12,1,0.227,83,69,14,0.1687,0.8313,False,Économie-Gestion,1
+54,978-2-070054-167-3,Stratégie d’Entreprise,Isabelle Martel,7,Économie-Gestion,Finance / Management,Master,French,2021,medium,16,1,0.65,62,31,31,0.5,0.5,False,Économie-Gestion,1
+55,978-2-070055-680-5,Économie Numérique,Lina Hoffmann,7,Économie-Gestion,Finance / Management,Master,French,2024,medium,16,1,0.65,61,31,30,0.4918,0.5082,False,Économie-Gestion,1
+56,978-2-070056-317-7,Supply Chain Analytics,Adam Schmidt,7,Économie-Gestion,Finance / Management,Master,English,2023,medium,16,1,0.65,62,33,29,0.4677,0.5323,False,Économie-Gestion,1
+57,978-2-080057-505-7,Sociologie des Organisations,Claire Aubry,8,Sciences Humaines,Sociologie / Psychologie,Undergraduate,French,2019,low,17,1,0.122,107,85,22,0.2056,0.7944,False,Sciences Humaines,1
+58,978-2-080058-246-4,Psychologie Cognitive,Manon Lerat,8,Sciences Humaines,Sociologie / Psychologie,Undergraduate,French,2020,low,17,1,0.122,116,98,18,0.1552,0.8448,False,Sciences Humaines,1
+59,978-2-080059-242-3,Méthodes Qualitatives,Nelly Bernard,8,Sciences Humaines,Sociologie / Psychologie,Master,French,2018,low,17,1,0.122,118,95,23,0.1949,0.8051,False,Sciences Humaines,1
+60,978-2-080060-862-8,Éducation et Inégalités,Omar Haddadi,8,Sciences Humaines,Sociologie / Psychologie,Master,French,2021,low,17,1,0.122,103,81,22,0.2136,0.7864,False,Sciences Humaines,1
+61,978-2-080061-651-4,Anthropologie Contemporaine,Éric Denis,8,Sciences Humaines,Sociologie / Psychologie,Doctorate,French,2017,low,17,1,0.122,110,87,23,0.2091,0.7909,False,Sciences Humaines,1
+62,978-2-080062-864-9,Communication Interculturelle,Sonia Alvarez,8,Sciences Humaines,Sociologie / Psychologie,Undergraduate,French,2020,low,17,1,0.122,110,90,20,0.1818,0.8182,False,Sciences Humaines,1
+63,978-2-080063-538-9,Urbanisme et Territoires,Florian Adam,8,Sciences Humaines,Sociologie / Psychologie,Master,French,2022,medium,16,1,0.35,63,35,28,0.4444,0.5556,False,Sciences Humaines,1
+64,978-2-080064-508-5,Travail et Numérique,Maëlle Picard,8,Sciences Humaines,Sociologie / Psychologie,Master,French,2023,medium,16,1,0.35,61,33,28,0.459,0.541,False,Sciences Humaines,1
+65,978-2-090065-324-2,Romans Français du XXe Siècle,Henri Valois,9,Littérature,Romans / essais,Undergraduate,French,2015,low,17,1,0.07,116,95,21,0.181,0.819,False,Littérature,1
+66,978-2-090066-621-7,Littérature Comparée,Marina Vasseur,9,Littérature,Romans / essais,Master,French,2017,low,17,1,0.07,120,100,20,0.1667,0.8333,False,Littérature,1
+67,978-2-090067-193-0,Poésie Moderne,Léa Tessier,9,Littérature,Romans / essais,Undergraduate,French,2016,low,17,1,0.07,120,94,26,0.2167,0.7833,False,Littérature,1
+68,978-2-090068-981-1,Théâtre Classique,Arthur Delmas,9,Littérature,Romans / essais,Undergraduate,French,2014,low,17,1,0.07,119,94,25,0.2101,0.7899,False,Littérature,1
+69,978-2-090069-256-2,Essais Contemporains,Louise Perrier,9,Littérature,Romans / essais,Master,French,2019,low,17,1,0.07,119,95,24,0.2017,0.7983,False,Littérature,1
+70,978-2-090070-911-6,World Literature Anthology,Olivia Green,9,Littérature,Romans / essais,Undergraduate,English,2020,low,17,1,0.07,109,83,26,0.2385,0.7615,False,Littérature,1
+71,978-2-090071-710-1,Narratologie,Benoît Charrier,9,Littérature,Romans / essais,Doctorate,French,2018,low,17,1,0.07,105,82,23,0.219,0.781,False,Littérature,1
+72,978-2-090072-494-6,Écriture Créative,Amélie Meyer,9,Littérature,Romans / essais,Undergraduate,French,2021,low,17,1,0.07,115,94,21,0.1826,0.8174,False,Littérature,1

@@ -1,0 +1,191 @@
+// Mesures validées — modèle commun EDW Library
+// Version adaptée : une seule table de faits FACT_LIBRARY.
+// Créer une table vide _Mesures dans Power BI puis déplacer les mesures dedans.
+
+DEFINE
+    // =========================
+    // Mesures générales — Pages 1 & 2
+    // =========================
+
+    MEASURE 'FACT_LIBRARY'[Total Emprunts] =
+        CALCULATE (
+            COUNTROWS ( 'FACT_LIBRARY' ),
+            'FACT_LIBRARY'[event_type] = "loan"
+        )
+
+    MEASURE 'FACT_LIBRARY'[Total Réservations] =
+        CALCULATE (
+            COUNTROWS ( 'FACT_LIBRARY' ),
+            'FACT_LIBRARY'[event_type] = "reservation"
+        )
+
+    MEASURE 'FACT_LIBRARY'[Emprunteurs Actifs] =
+        CALCULATE (
+            DISTINCTCOUNT ( 'FACT_LIBRARY'[user_id] ),
+            'FACT_LIBRARY'[event_type] = "loan"
+        )
+
+    MEASURE 'FACT_LIBRARY'[Durée Moyenne de Prêt] =
+        CALCULATE (
+            AVERAGE ( 'FACT_LIBRARY'[loan_duration_days] ),
+            'FACT_LIBRARY'[event_type] = "loan"
+        )
+
+    MEASURE 'FACT_LIBRARY'[Emprunts Période Examen] =
+        CALCULATE (
+            [Total Emprunts],
+            'DIM_DATE'[is_exam_period] = TRUE ()
+        )
+
+    MEASURE 'FACT_LIBRARY'[Emprunts Hors Examen] =
+        CALCULATE (
+            [Total Emprunts],
+            'DIM_DATE'[is_exam_period] = FALSE ()
+        )
+
+    MEASURE 'FACT_LIBRARY'[Part Emprunts Examen] =
+        DIVIDE ( [Emprunts Période Examen], [Total Emprunts] )
+
+    MEASURE 'FACT_LIBRARY'[Ratio Examen vs Hors Examen] =
+        DIVIDE ( [Emprunts Période Examen], [Emprunts Hors Examen] )
+
+    // =========================
+    // Géographie — Page 3
+    // =========================
+
+    MEASURE 'FACT_LIBRARY'[Emprunts France] =
+        CALCULATE ( [Total Emprunts], 'DIM_BRANCH'[country] = "France" )
+
+    MEASURE 'FACT_LIBRARY'[Emprunts Belgique] =
+        CALCULATE ( [Total Emprunts], 'DIM_BRANCH'[country] = "Belgique" )
+
+    MEASURE 'FACT_LIBRARY'[Part France] =
+        DIVIDE ( [Emprunts France], [Total Emprunts] )
+
+    // =========================
+    // Usagers & retards — Page 4
+    // =========================
+
+    MEASURE 'FACT_LIBRARY'[Nombre de Retards] =
+        CALCULATE (
+            COUNTROWS ( 'FACT_LIBRARY' ),
+            'FACT_LIBRARY'[event_type] = "loan",
+            'FACT_LIBRARY'[days_overdue] > 0
+        )
+
+    MEASURE 'FACT_LIBRARY'[Taux de Retard] =
+        DIVIDE ( [Nombre de Retards], [Total Emprunts] )
+
+    MEASURE 'FACT_LIBRARY'[Jours de Retard Moyens] =
+        CALCULATE (
+            AVERAGE ( 'FACT_LIBRARY'[days_overdue] ),
+            'FACT_LIBRARY'[event_type] = "loan",
+            'FACT_LIBRARY'[days_overdue] > 0
+        )
+
+    MEASURE 'FACT_LIBRARY'[Pénalités Totales] =
+        CALCULATE (
+            SUM ( 'FACT_LIBRARY'[penalty_amount] ),
+            'FACT_LIBRARY'[event_type] = "loan"
+        )
+
+    MEASURE 'FACT_LIBRARY'[Emprunts par Emprunteur Actif] =
+        DIVIDE ( [Total Emprunts], [Emprunteurs Actifs] )
+
+    // =========================
+    // Catalogue & inventaire — Pages 5 & 6
+    // Les mesures de stock ignorent le filtre de date pour afficher le stock courant.
+    // =========================
+
+    MEASURE 'FACT_LIBRARY'[Total Exemplaires] =
+        CALCULATE (
+            SUM ( 'FACT_LIBRARY'[total_copies] ),
+            'FACT_LIBRARY'[event_type] = "inventory_snapshot",
+            REMOVEFILTERS ( 'DIM_DATE' )
+        )
+
+    MEASURE 'FACT_LIBRARY'[Exemplaires Disponibles] =
+        CALCULATE (
+            SUM ( 'FACT_LIBRARY'[available_copies] ),
+            'FACT_LIBRARY'[event_type] = "inventory_snapshot",
+            REMOVEFILTERS ( 'DIM_DATE' )
+        )
+
+    MEASURE 'FACT_LIBRARY'[Exemplaires Occupés] =
+        CALCULATE (
+            SUM ( 'FACT_LIBRARY'[active_loans] ),
+            'FACT_LIBRARY'[event_type] = "inventory_snapshot",
+            REMOVEFILTERS ( 'DIM_DATE' )
+        )
+
+    MEASURE 'FACT_LIBRARY'[Availability Rate] =
+        DIVIDE ( [Exemplaires Disponibles], [Total Exemplaires] )
+
+    MEASURE 'FACT_LIBRARY'[Taux de Disponibilité Global] =
+        [Availability Rate]
+
+    MEASURE 'FACT_LIBRARY'[Utilization Rate] =
+        DIVIDE ( [Exemplaires Occupés], [Total Exemplaires] )
+
+    MEASURE 'FACT_LIBRARY'[Taux d’Occupation] =
+        [Utilization Rate]
+
+    MEASURE 'FACT_LIBRARY'[Titres en Rupture] =
+        COUNTROWS (
+            FILTER (
+                ADDCOLUMNS (
+                    VALUES ( 'DIM_BOOK'[book_id] ),
+                    "CopiesDisponibles",
+                        CALCULATE (
+                            SUM ( 'FACT_LIBRARY'[available_copies] ),
+                            'FACT_LIBRARY'[event_type] = "inventory_snapshot",
+                            REMOVEFILTERS ( 'DIM_DATE' )
+                        )
+                ),
+                [CopiesDisponibles] = 0
+            )
+        )
+
+    MEASURE 'FACT_LIBRARY'[Livre-Branche en Rupture] =
+        CALCULATE (
+            COUNTROWS ( 'FACT_LIBRARY' ),
+            'FACT_LIBRARY'[event_type] = "inventory_snapshot",
+            'FACT_LIBRARY'[available_copies] = 0,
+            REMOVEFILTERS ( 'DIM_DATE' )
+        )
+
+    MEASURE 'FACT_LIBRARY'[Réservations Pending] =
+        CALCULATE (
+            COUNTROWS ( 'FACT_LIBRARY' ),
+            'FACT_LIBRARY'[event_type] = "reservation",
+            'FACT_LIBRARY'[reservation_status] = "pending"
+        )
+
+    MEASURE 'FACT_LIBRARY'[Réservations Cancelled] =
+        CALCULATE (
+            COUNTROWS ( 'FACT_LIBRARY' ),
+            'FACT_LIBRARY'[event_type] = "reservation",
+            'FACT_LIBRARY'[reservation_status] = "cancelled"
+        )
+
+    MEASURE 'FACT_LIBRARY'[Réservations Non Satisfaites] =
+        [Réservations Pending] + [Réservations Cancelled]
+
+    MEASURE 'FACT_LIBRARY'[Délai d’Attente Moyen] =
+        CALCULATE (
+            AVERAGE ( 'FACT_LIBRARY'[wait_days] ),
+            'FACT_LIBRARY'[event_type] = "reservation"
+        )
+
+    MEASURE 'FACT_LIBRARY'[Score Tension Stock] =
+        [Utilization Rate] * 0.7
+            + DIVIDE ( [Réservations Non Satisfaites], [Total Exemplaires] ) * 0.3
+
+EVALUATE
+ROW (
+    "Total emprunts", [Total Emprunts],
+    "Réservations", [Total Réservations],
+    "Disponibilité", [Availability Rate],
+    "Occupation", [Utilization Rate],
+    "Taux retard", [Taux de Retard]
+)

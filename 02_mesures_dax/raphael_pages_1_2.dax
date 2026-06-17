@@ -1,0 +1,37 @@
+// Raphaël — Pages 1 & 2
+// Version une seule table de faits : FACT_LIBRARY.
+
+DEFINE
+    MEASURE 'FACT_LIBRARY'[Total Emprunts] =
+        CALCULATE ( COUNTROWS ( 'FACT_LIBRARY' ), 'FACT_LIBRARY'[event_type] = "loan" )
+
+    MEASURE 'FACT_LIBRARY'[Emprunteurs Actifs] =
+        CALCULATE ( DISTINCTCOUNT ( 'FACT_LIBRARY'[user_id] ), 'FACT_LIBRARY'[event_type] = "loan" )
+
+    MEASURE 'FACT_LIBRARY'[Durée Moyenne de Prêt] =
+        CALCULATE ( AVERAGE ( 'FACT_LIBRARY'[loan_duration_days] ), 'FACT_LIBRARY'[event_type] = "loan" )
+
+    MEASURE 'FACT_LIBRARY'[Total Exemplaires] =
+        CALCULATE ( SUM ( 'FACT_LIBRARY'[total_copies] ), 'FACT_LIBRARY'[event_type] = "inventory_snapshot", REMOVEFILTERS ( 'DIM_DATE' ) )
+
+    MEASURE 'FACT_LIBRARY'[Exemplaires Disponibles] =
+        CALCULATE ( SUM ( 'FACT_LIBRARY'[available_copies] ), 'FACT_LIBRARY'[event_type] = "inventory_snapshot", REMOVEFILTERS ( 'DIM_DATE' ) )
+
+    MEASURE 'FACT_LIBRARY'[Taux de Disponibilité Global] =
+        DIVIDE ( [Exemplaires Disponibles], [Total Exemplaires] )
+
+    MEASURE 'FACT_LIBRARY'[Emprunts Période Examen] =
+        CALCULATE ( [Total Emprunts], 'DIM_DATE'[is_exam_period] = TRUE () )
+
+    MEASURE 'FACT_LIBRARY'[Emprunts Hors Examen] =
+        CALCULATE ( [Total Emprunts], 'DIM_DATE'[is_exam_period] = FALSE () )
+
+    MEASURE 'FACT_LIBRARY'[Ratio Examen vs Hors Examen] =
+        DIVIDE ( [Emprunts Période Examen], [Emprunts Hors Examen] )
+
+EVALUATE
+SUMMARIZECOLUMNS (
+    'DIM_DATE'[year_month],
+    "Emprunts", [Total Emprunts],
+    "Emprunts examen", [Emprunts Période Examen]
+)

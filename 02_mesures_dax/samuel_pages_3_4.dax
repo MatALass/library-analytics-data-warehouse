@@ -1,0 +1,39 @@
+// Samuel — Pages 3 & 4
+// Version une seule table de faits : FACT_LIBRARY.
+
+DEFINE
+    MEASURE 'FACT_LIBRARY'[Total Emprunts] =
+        CALCULATE ( COUNTROWS ( 'FACT_LIBRARY' ), 'FACT_LIBRARY'[event_type] = "loan" )
+
+    MEASURE 'FACT_LIBRARY'[Emprunteurs Actifs] =
+        CALCULATE ( DISTINCTCOUNT ( 'FACT_LIBRARY'[user_id] ), 'FACT_LIBRARY'[event_type] = "loan" )
+
+    MEASURE 'FACT_LIBRARY'[Emprunts France] =
+        CALCULATE ( [Total Emprunts], 'DIM_BRANCH'[country] = "France" )
+
+    MEASURE 'FACT_LIBRARY'[Emprunts Belgique] =
+        CALCULATE ( [Total Emprunts], 'DIM_BRANCH'[country] = "Belgique" )
+
+    MEASURE 'FACT_LIBRARY'[Nombre de Retards] =
+        CALCULATE (
+            COUNTROWS ( 'FACT_LIBRARY' ),
+            'FACT_LIBRARY'[event_type] = "loan",
+            'FACT_LIBRARY'[days_overdue] > 0
+        )
+
+    MEASURE 'FACT_LIBRARY'[Taux de Retard] =
+        DIVIDE ( [Nombre de Retards], [Total Emprunts] )
+
+    MEASURE 'FACT_LIBRARY'[Pénalités Totales] =
+        CALCULATE ( SUM ( 'FACT_LIBRARY'[penalty_amount] ), 'FACT_LIBRARY'[event_type] = "loan" )
+
+    MEASURE 'FACT_LIBRARY'[Durée Moyenne de Prêt] =
+        CALCULATE ( AVERAGE ( 'FACT_LIBRARY'[loan_duration_days] ), 'FACT_LIBRARY'[event_type] = "loan" )
+
+EVALUATE
+SUMMARIZECOLUMNS (
+    'DIM_BRANCH'[country],
+    'DIM_BRANCH'[branch_name],
+    "Emprunts", [Total Emprunts],
+    "Taux retard", [Taux de Retard]
+)
