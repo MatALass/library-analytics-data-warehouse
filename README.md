@@ -1,4 +1,4 @@
-# PowerBI EDW Library Project — version adaptée avec une seule fact
+# Library-Analytics-Data-Warehouse
 
 Projet Power BI basé sur un modèle en étoile pour analyser l'activité d'un réseau de bibliothèques académiques.
 
