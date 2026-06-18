@@ -1,4 +1,4 @@
-date_id,full_date,year,quarter,quarter_label,month_number,month_name,year_month,week_number,day_of_week,day_name,is_weekend,is_exam_period,academic_year,academic_period
+﻿date_id,full_date,year,quarter,quarter_label,month_number,month_name,year_month,week_number,day_of_week,day_name,is_weekend,is_exam_period,academic_year,academic_period
 20240901,2024-09-01,2024,3,T3,9,Septembre,2024-09,35,7,Sunday,True,False,2024-2025,Rentrée
 20240902,2024-09-02,2024,3,T3,9,Septembre,2024-09,36,1,Monday,False,False,2024-2025,Rentrée
 20240903,2024-09-03,2024,3,T3,9,Septembre,2024-09,36,2,Tuesday,False,False,2024-2025,Rentrée

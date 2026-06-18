@@ -1,191 +1,68 @@
-// Mesures validées — modèle commun EDW Library
-// Version adaptée : une seule table de faits FACT_LIBRARY.
-// Créer une table vide _Mesures dans Power BI puis déplacer les mesures dedans.
+// ===========================================================================
+// mesures_validees_modele_commun.dax
+// Mesures de BASE partagees par toutes les pages. A integrer en premier.
+// ---------------------------------------------------------------------------
+// Modele : constellation 3 facts (FACT_LOAN, FACT_RESERVATION,
+//          FACT_INVENTORY_SNAPSHOT) + 5 dimensions.
+// DIM_DATE doit etre marquee comme table de dates sur [full_date].
+//
+// CONVENTIONS DE TYPE (verifier a l'import) :
+//   - is_exam_period, is_weekend, out_of_stock  -> Booleen  => comparer a TRUE()
+//     Si Power BI les a importes en TEXTE, remplacer "= TRUE()" par '= "True"'.
+//   - tous les *_id, durees, compteurs           -> Nombre entier
+//   - utilization_rate, availability_rate, penalty_amount -> Decimal
+//
+// RAPPEL SNAPSHOT : FACT_INVENTORY_SNAPSHOT est un snapshot periodique mensuel.
+//   Ne JAMAIS sommer ses colonnes a travers le temps. On agrege au sein d'un
+//   mois (SUM correct), et pour un KPI "etat courant" on epingle le dernier
+//   snapshot (voir [_Date Dernier Snapshot]).
+// ===========================================================================
 
-DEFINE
-    // =========================
-    // Mesures générales — Pages 1 & 2
-    // =========================
 
-    MEASURE 'FACT_LIBRARY'[Total Emprunts] =
-        CALCULATE (
-            COUNTROWS ( 'FACT_LIBRARY' ),
-            'FACT_LIBRARY'[event_type] = "loan"
-        )
+// --- EMPRUNTS -------------------------------------------------------------
 
-    MEASURE 'FACT_LIBRARY'[Total Réservations] =
-        CALCULATE (
-            COUNTROWS ( 'FACT_LIBRARY' ),
-            'FACT_LIBRARY'[event_type] = "reservation"
-        )
+Total Emprunts = COUNTROWS ( FACT_LOAN )
 
-    MEASURE 'FACT_LIBRARY'[Emprunteurs Actifs] =
-        CALCULATE (
-            DISTINCTCOUNT ( 'FACT_LIBRARY'[user_id] ),
-            'FACT_LIBRARY'[event_type] = "loan"
-        )
+Emprunts En Cours =
+CALCULATE ( COUNTROWS ( FACT_LOAN ), ISBLANK ( FACT_LOAN[return_date] ) )
 
-    MEASURE 'FACT_LIBRARY'[Durée Moyenne de Prêt] =
-        CALCULATE (
-            AVERAGE ( 'FACT_LIBRARY'[loan_duration_days] ),
-            'FACT_LIBRARY'[event_type] = "loan"
-        )
+Emprunts Clotures =
+CALCULATE ( COUNTROWS ( FACT_LOAN ), NOT ISBLANK ( FACT_LOAN[return_date] ) )
 
-    MEASURE 'FACT_LIBRARY'[Emprunts Période Examen] =
-        CALCULATE (
-            [Total Emprunts],
-            'DIM_DATE'[is_exam_period] = TRUE ()
-        )
+Quantite Empruntee = SUM ( FACT_LOAN[quantity] )
 
-    MEASURE 'FACT_LIBRARY'[Emprunts Hors Examen] =
-        CALCULATE (
-            [Total Emprunts],
-            'DIM_DATE'[is_exam_period] = FALSE ()
-        )
 
-    MEASURE 'FACT_LIBRARY'[Part Emprunts Examen] =
-        DIVIDE ( [Emprunts Période Examen], [Total Emprunts] )
+// --- RESERVATIONS ---------------------------------------------------------
 
-    MEASURE 'FACT_LIBRARY'[Ratio Examen vs Hors Examen] =
-        DIVIDE ( [Emprunts Période Examen], [Emprunts Hors Examen] )
+Total Reservations = COUNTROWS ( FACT_RESERVATION )
 
-    // =========================
-    // Géographie — Page 3
-    // =========================
+Reservations Satisfaites =
+CALCULATE ( [Total Reservations], FACT_RESERVATION[reservation_status] = "fulfilled" )
 
-    MEASURE 'FACT_LIBRARY'[Emprunts France] =
-        CALCULATE ( [Total Emprunts], 'DIM_BRANCH'[country] = "France" )
+Reservations En Attente =
+CALCULATE ( [Total Reservations], FACT_RESERVATION[reservation_status] = "pending" )
 
-    MEASURE 'FACT_LIBRARY'[Emprunts Belgique] =
-        CALCULATE ( [Total Emprunts], 'DIM_BRANCH'[country] = "Belgique" )
+Reservations Annulees =
+CALCULATE ( [Total Reservations], FACT_RESERVATION[reservation_status] = "cancelled" )
 
-    MEASURE 'FACT_LIBRARY'[Part France] =
-        DIVIDE ( [Emprunts France], [Total Emprunts] )
 
-    // =========================
-    // Usagers & retards — Page 4
-    // =========================
+// --- CARDINALITES UTILES --------------------------------------------------
 
-    MEASURE 'FACT_LIBRARY'[Nombre de Retards] =
-        CALCULATE (
-            COUNTROWS ( 'FACT_LIBRARY' ),
-            'FACT_LIBRARY'[event_type] = "loan",
-            'FACT_LIBRARY'[days_overdue] > 0
-        )
+Usagers Actifs = DISTINCTCOUNT ( FACT_LOAN[user_id] )
 
-    MEASURE 'FACT_LIBRARY'[Taux de Retard] =
-        DIVIDE ( [Nombre de Retards], [Total Emprunts] )
+Livres Distincts Empruntes = DISTINCTCOUNT ( FACT_LOAN[book_id] )
 
-    MEASURE 'FACT_LIBRARY'[Jours de Retard Moyens] =
-        CALCULATE (
-            AVERAGE ( 'FACT_LIBRARY'[days_overdue] ),
-            'FACT_LIBRARY'[event_type] = "loan",
-            'FACT_LIBRARY'[days_overdue] > 0
-        )
+Branches Actives = DISTINCTCOUNT ( FACT_LOAN[branch_id] )
 
-    MEASURE 'FACT_LIBRARY'[Pénalités Totales] =
-        CALCULATE (
-            SUM ( 'FACT_LIBRARY'[penalty_amount] ),
-            'FACT_LIBRARY'[event_type] = "loan"
-        )
+Nb Jours = DISTINCTCOUNT ( FACT_LOAN[date_id] )   // jours avec au moins 1 emprunt
 
-    MEASURE 'FACT_LIBRARY'[Emprunts par Emprunteur Actif] =
-        DIVIDE ( [Total Emprunts], [Emprunteurs Actifs] )
 
-    // =========================
-    // Catalogue & inventaire — Pages 5 & 6
-    // Les mesures de stock ignorent le filtre de date pour afficher le stock courant.
-    // =========================
+// --- HELPER SNAPSHOT ------------------------------------------------------
+// Renvoie le date_id du dernier snapshot dans le contexte (respecte les
+// slicers via ALLSELECTED). Sert a epingler les KPI de stock "etat courant".
 
-    MEASURE 'FACT_LIBRARY'[Total Exemplaires] =
-        CALCULATE (
-            SUM ( 'FACT_LIBRARY'[total_copies] ),
-            'FACT_LIBRARY'[event_type] = "inventory_snapshot",
-            REMOVEFILTERS ( 'DIM_DATE' )
-        )
-
-    MEASURE 'FACT_LIBRARY'[Exemplaires Disponibles] =
-        CALCULATE (
-            SUM ( 'FACT_LIBRARY'[available_copies] ),
-            'FACT_LIBRARY'[event_type] = "inventory_snapshot",
-            REMOVEFILTERS ( 'DIM_DATE' )
-        )
-
-    MEASURE 'FACT_LIBRARY'[Exemplaires Occupés] =
-        CALCULATE (
-            SUM ( 'FACT_LIBRARY'[active_loans] ),
-            'FACT_LIBRARY'[event_type] = "inventory_snapshot",
-            REMOVEFILTERS ( 'DIM_DATE' )
-        )
-
-    MEASURE 'FACT_LIBRARY'[Availability Rate] =
-        DIVIDE ( [Exemplaires Disponibles], [Total Exemplaires] )
-
-    MEASURE 'FACT_LIBRARY'[Taux de Disponibilité Global] =
-        [Availability Rate]
-
-    MEASURE 'FACT_LIBRARY'[Utilization Rate] =
-        DIVIDE ( [Exemplaires Occupés], [Total Exemplaires] )
-
-    MEASURE 'FACT_LIBRARY'[Taux d’Occupation] =
-        [Utilization Rate]
-
-    MEASURE 'FACT_LIBRARY'[Titres en Rupture] =
-        COUNTROWS (
-            FILTER (
-                ADDCOLUMNS (
-                    VALUES ( 'DIM_BOOK'[book_id] ),
-                    "CopiesDisponibles",
-                        CALCULATE (
-                            SUM ( 'FACT_LIBRARY'[available_copies] ),
-                            'FACT_LIBRARY'[event_type] = "inventory_snapshot",
-                            REMOVEFILTERS ( 'DIM_DATE' )
-                        )
-                ),
-                [CopiesDisponibles] = 0
-            )
-        )
-
-    MEASURE 'FACT_LIBRARY'[Livre-Branche en Rupture] =
-        CALCULATE (
-            COUNTROWS ( 'FACT_LIBRARY' ),
-            'FACT_LIBRARY'[event_type] = "inventory_snapshot",
-            'FACT_LIBRARY'[available_copies] = 0,
-            REMOVEFILTERS ( 'DIM_DATE' )
-        )
-
-    MEASURE 'FACT_LIBRARY'[Réservations Pending] =
-        CALCULATE (
-            COUNTROWS ( 'FACT_LIBRARY' ),
-            'FACT_LIBRARY'[event_type] = "reservation",
-            'FACT_LIBRARY'[reservation_status] = "pending"
-        )
-
-    MEASURE 'FACT_LIBRARY'[Réservations Cancelled] =
-        CALCULATE (
-            COUNTROWS ( 'FACT_LIBRARY' ),
-            'FACT_LIBRARY'[event_type] = "reservation",
-            'FACT_LIBRARY'[reservation_status] = "cancelled"
-        )
-
-    MEASURE 'FACT_LIBRARY'[Réservations Non Satisfaites] =
-        [Réservations Pending] + [Réservations Cancelled]
-
-    MEASURE 'FACT_LIBRARY'[Délai d’Attente Moyen] =
-        CALCULATE (
-            AVERAGE ( 'FACT_LIBRARY'[wait_days] ),
-            'FACT_LIBRARY'[event_type] = "reservation"
-        )
-
-    MEASURE 'FACT_LIBRARY'[Score Tension Stock] =
-        [Utilization Rate] * 0.7
-            + DIVIDE ( [Réservations Non Satisfaites], [Total Exemplaires] ) * 0.3
-
-EVALUATE
-ROW (
-    "Total emprunts", [Total Emprunts],
-    "Réservations", [Total Réservations],
-    "Disponibilité", [Availability Rate],
-    "Occupation", [Utilization Rate],
-    "Taux retard", [Taux de Retard]
+_Date Dernier Snapshot =
+CALCULATE (
+    MAX ( FACT_INVENTORY_SNAPSHOT[date_id] ),
+    ALLSELECTED ( DIM_DATE )
 )

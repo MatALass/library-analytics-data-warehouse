@@ -1,45 +1,63 @@
-# Schéma en étoile — version une seule table de faits
+# Schéma en constellation — 3 tables de faits
 
-## Table de faits centrale
+Le projet utilise trois tables de faits qui partagent les mêmes dimensions
+conformes (schéma dit « en constellation » ou *fact constellation*).
 
-### `FACT_LIBRARY`
+## Tables de faits
 
-Cette table contient toutes les observations métier du projet. La colonne structurante est :
+### `FACT_LOAN` — grain : un emprunt
+Un événement transactionnel : un usager emprunte un livre dans une branche à une date.
+Colonnes métier : durées, retards, pénalités. Aucune colonne vide.
 
-- `event_type`
+### `FACT_RESERVATION` — grain : une réservation
+Un événement transactionnel : un usager réserve un livre. Colonnes métier :
+statut (`fulfilled` / `pending` / `cancelled`) et délai d'attente.
 
-Valeurs possibles :
+### `FACT_INVENTORY_SNAPSHOT` — grain : livre × branche × mois
+Un *snapshot périodique* (fin de mois) de l'état de stock d'un livre dans une
+branche. Pas d'usager. Colonnes métier : exemplaires, taux d'occupation /
+disponibilité, ruptures, réservations non satisfaites, priorité de réallocation.
+C'est la table qui alimente le moteur de recommandation prescriptif.
 
-- `loan` : emprunt d'un livre par un usager.
-- `reservation` : demande de réservation.
-- `inventory_snapshot` : état de stock pour un couple livre × branche.
+## Dimensions partagées
 
-## Dimensions
+`DIM_DATE`, `DIM_BOOK`, `DIM_BRANCH`, `DIM_CATEGORY`, `DIM_USER`.
 
-- `DIM_DATE`
-- `DIM_CATEGORY`
-- `DIM_BOOK`
-- `DIM_BRANCH`
-- `DIM_USER`
+`DIM_BOOK` ne contient plus que des **attributs de livre**. Les anciennes colonnes
+d'inventaire (`total_copies`, `available_copies`, `active_loans`,
+`utilization_rate`, `availability_rate`, `out_of_stock_global`, `book_count`) ont
+été retirées : ce sont des faits, ils vivent dans `FACT_INVENTORY_SNAPSHOT` au bon
+grain (livre × branche × mois). On garde `base_total_copies` comme attribut de
+dotation catalogue.
 
 ## Relations Power BI
 
 ```text
-DIM_DATE[date_id]         1 ─── * FACT_LIBRARY[date_id]
-DIM_CATEGORY[category_id] 1 ─── * FACT_LIBRARY[category_id]
-DIM_BOOK[book_id]         1 ─── * FACT_LIBRARY[book_id]
-DIM_BRANCH[branch_id]     1 ─── * FACT_LIBRARY[branch_id]
-DIM_USER[user_id]         1 ─── * FACT_LIBRARY[user_id]
+DIM_DATE[date_id]          1 ─── *  FACT_LOAN[date_id]
+DIM_USER[user_id]          1 ─── *  FACT_LOAN[user_id]
+DIM_BOOK[book_id]          1 ─── *  FACT_LOAN[book_id]
+DIM_BRANCH[branch_id]      1 ─── *  FACT_LOAN[branch_id]
+DIM_CATEGORY[category_id]  1 ─── *  FACT_LOAN[category_id]
+
+DIM_DATE[date_id]          1 ─── *  FACT_RESERVATION[date_id]
+DIM_USER[user_id]          1 ─── *  FACT_RESERVATION[user_id]
+DIM_BOOK[book_id]          1 ─── *  FACT_RESERVATION[book_id]
+DIM_BRANCH[branch_id]      1 ─── *  FACT_RESERVATION[branch_id]
+DIM_CATEGORY[category_id]  1 ─── *  FACT_RESERVATION[category_id]
+
+DIM_DATE[date_id]          1 ─── *  FACT_INVENTORY_SNAPSHOT[date_id]
+DIM_BOOK[book_id]          1 ─── *  FACT_INVENTORY_SNAPSHOT[book_id]
+DIM_BRANCH[branch_id]      1 ─── *  FACT_INVENTORY_SNAPSHOT[branch_id]
+DIM_CATEGORY[category_id]  1 ─── *  FACT_INVENTORY_SNAPSHOT[category_id]
 ```
 
-Paramètres recommandés :
+Paramètres : cardinalité `One-to-many`, direction de filtre `Single`
+(les dimensions filtrent les faits). Détails et pièges dans
+`RELATIONS_POWERBI.md`.
 
-- Cardinalité : `One-to-many`.
-- Direction de filtre : `Single`.
-- Les dimensions filtrent la table de faits.
+## Conséquence sur les mesures DAX
 
-## Remarque de modélisation importante
-
-Dans un entrepôt de données strict, les emprunts/réservations et les snapshots de stock seraient souvent séparés en deux facts, car leur grain n'est pas le même. Ici, comme le projet impose une seule fact, on utilise une table de faits unique avec un discriminant `event_type`.
-
-La conséquence est simple : les mesures DAX doivent être rigoureuses. Une mesure d'emprunt filtre `event_type = "loan"`. Une mesure de stock filtre `event_type = "inventory_snapshot"`. Une mesure de réservation filtre `event_type = "reservation"`.
+Plus besoin de filtrer un discriminant `event_type` partout : chaque mesure
+s'écrit sur sa propre fact. `COUNTROWS(FACT_LOAN)` = nombre d'emprunts, point.
+`SUM(FACT_INVENTORY_SNAPSHOT[total_copies])` répond correctement au filtre branche.
+C'est le bénéfice principal du découpage.

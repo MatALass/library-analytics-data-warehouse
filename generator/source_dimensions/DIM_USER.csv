@@ -1,4 +1,4 @@
-user_id,user_code,first_name,last_name,full_name,user_type,faculty,academic_level,country,preferred_branch_id,enrollment_year,is_active
+﻿user_id,user_code,first_name,last_name,full_name,user_type,faculty,academic_level,country,preferred_branch_id,enrollment_year,is_active
 1,U0001,Inès,Roux,Inès Roux,Student,Droit,Undergraduate,France,6,2023,True
 2,U0002,Alice,Laurent,Alice Laurent,Student,Droit,Doctorate,Belgique,1,2026,True
 3,U0003,Gabriel,Martin,Gabriel Martin,Researcher,Informatique,Doctorate,France,1,2018,True

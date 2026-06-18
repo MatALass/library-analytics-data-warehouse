@@ -1,4 +1,4 @@
-branch_id,branch_name,city,country,branch_type,department,latitude,longitude,branch_profile
+﻿branch_id,branch_name,city,country,branch_type,department,latitude,longitude,branch_profile
 1,Bibliothèque Paris-Centre,Paris,France,Université,Île-de-France,48.8566,2.3522,Très forte activité : étudiants data/droit
 2,Campus LyonTech,Lyon,France,École,Auvergne-Rhône-Alpes,45.764,4.8357,Forte activité : engineering et BI
 3,IUT Lille Médiathèque,Lille,France,IUT,Hauts-de-France,50.6292,3.0573,Activité moyenne : BUT/IUT

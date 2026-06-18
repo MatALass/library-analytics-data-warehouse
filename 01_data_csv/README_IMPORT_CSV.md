@@ -1,48 +1,15 @@
-# Import des CSV dans Power BI — version une seule table de faits
+# Import des CSV dans Power BI
 
-## Tables à importer
+Fichiers (UTF-8 sans BOM, séparateur `,`) :
 
-Dimensions :
+Dimensions : `DIM_DATE`, `DIM_CATEGORY`, `DIM_BOOK`, `DIM_BRANCH`, `DIM_USER`.
+Faits : `FACT_LOAN`, `FACT_RESERVATION`, `FACT_INVENTORY_SNAPSHOT`.
 
-- `DIM_DATE.csv`
-- `DIM_CATEGORY.csv`
-- `DIM_BOOK.csv`
-- `DIM_BRANCH.csv`
-- `DIM_USER.csv`
+1. Importer les 5 dimensions puis les 3 faits.
+2. Vérifier les types : les `*_id`, durées, compteurs en **Nombre entier** ;
+   `utilization_rate` / `availability_rate` / `penalty_amount` en **Décimal** ;
+   `out_of_stock` en **Booléen** ; les dates en **Date**.
+3. Créer les relations (voir `05_documentation/RELATIONS_POWERBI.md`).
+4. Marquer `DIM_DATE` comme table de dates sur `full_date`.
 
-Table de faits unique :
-
-- `FACT_LIBRARY.csv`
-
-## Relations recommandées
-
-Toutes les relations vont des dimensions vers `FACT_LIBRARY` :
-
-- `DIM_DATE[date_id]` → `FACT_LIBRARY[date_id]`
-- `DIM_CATEGORY[category_id]` → `FACT_LIBRARY[category_id]`
-- `DIM_BOOK[book_id]` → `FACT_LIBRARY[book_id]`
-- `DIM_BRANCH[branch_id]` → `FACT_LIBRARY[branch_id]`
-- `DIM_USER[user_id]` → `FACT_LIBRARY[user_id]`
-
-Cardinalité : `1:*`.
-Sens du filtre : `Single`, de la dimension vers la fact.
-
-## Point important sur la fact unique
-
-`FACT_LIBRARY.csv` contient trois types de lignes dans la colonne `event_type` :
-
-- `loan` : une ligne = un emprunt.
-- `reservation` : une ligne = une réservation.
-- `inventory_snapshot` : une ligne = un état de stock pour un couple livre × branche.
-
-Comme la table mélange plusieurs grains métiers, les mesures DAX doivent toujours filtrer `event_type`. C’est indispensable pour éviter les agrégations fausses.
-
-Exemples :
-
-- Total emprunts → filtrer `event_type = "loan"`.
-- Réservations non satisfaites → filtrer `event_type = "reservation"`.
-- Total exemplaires / disponibilité → filtrer `event_type = "inventory_snapshot"`.
-
-## Conseil Power BI
-
-Créez une table vide `_Mesures` dans Power BI et rangez-y toutes les mesures validées. Les fichiers DAX du dossier `02_mesures_dax` sont prêts pour cette organisation.
+Ces CSV sont régénérables via `generator/generate_data.py`.

@@ -1,44 +1,64 @@
 # Dictionnaire des données
 
-## `FACT_LIBRARY`
+## `FACT_LOAN` (grain : un emprunt)
 
-| Colonne | Description |
-|---|---|
-| `fact_id` | Identifiant technique de la ligne de fact. |
-| `source_id` | Identifiant dans l'ancienne source logique. |
-| `fact_source` | `event` ou `inventory`. |
-| `event_type` | `loan`, `reservation` ou `inventory_snapshot`. |
-| `date_id` | Clé de date reliée à `DIM_DATE`. |
-| `event_date` | Date lisible de l'événement ou du snapshot. |
-| `is_exam_period_event` | Indique si la date est en période d'examen. |
-| `user_id` | Clé usager. Vide pour les lignes de stock. |
-| `book_id` | Clé livre. |
-| `branch_id` | Clé branche. |
-| `category_id` | Clé catégorie. |
-| `reservation_status` | Statut de réservation : `fulfilled`, `pending`, `cancelled`. |
-| `loan_date` | Date d'emprunt. |
-| `due_date` | Date prévue de retour. |
-| `return_date` | Date réelle de retour. |
-| `loan_duration_days` | Durée effective du prêt. |
-| `days_overdue` | Nombre de jours de retard. |
-| `penalty_amount` | Montant de pénalité simulé. |
-| `wait_days` | Délai d'attente pour une réservation. |
-| `quantity` | Quantité transactionnelle, principalement 1 pour les emprunts. |
-| `total_copies` | Nombre total d'exemplaires pour une ligne `inventory_snapshot`. |
-| `available_copies` | Exemplaires disponibles pour une ligne `inventory_snapshot`. |
-| `active_loans` | Exemplaires actuellement occupés pour une ligne `inventory_snapshot`. |
-| `utilization_rate` | Taux d'occupation stocké au niveau livre × branche. |
-| `availability_rate` | Taux de disponibilité stocké au niveau livre × branche. |
-| `out_of_stock` | Indique une rupture locale livre × branche. |
-| `loan_count_total` | Historique total d'emprunts pour le couple livre × branche. |
-| `loan_count_120d` | Emprunts sur la période récente simulée. |
-| `unsatisfied_reservations` | Réservations non satisfaites simulées au niveau stock. |
-| `reallocation_priority` | Priorité de réallocation : `Critique`, `Haute`, `Normale`, etc. |
+| Colonne | Type | Description |
+|---|---|---|
+| `loan_id` | texte | Clé technique de l'emprunt. |
+| `date_id` | entier | Clé de date (→ `DIM_DATE`). |
+| `event_date` | date | Date de l'emprunt (lisible). |
+| `user_id` | entier | Clé usager (→ `DIM_USER`). |
+| `book_id` | entier | Clé livre (→ `DIM_BOOK`). |
+| `branch_id` | entier | Clé branche (→ `DIM_BRANCH`). |
+| `category_id` | entier | Clé catégorie (→ `DIM_CATEGORY`), = catégorie du livre. |
+| `loan_date` | date | Date d'emprunt. |
+| `due_date` | date | Date prévue de retour. |
+| `return_date` | date | Date réelle de retour. Vide si emprunt encore en cours. |
+| `loan_duration_days` | entier | Durée effective du prêt (jours). |
+| `days_overdue` | entier | Jours de retard (0 si à l'heure). |
+| `penalty_amount` | décimal | Pénalité simulée (0,30 €/jour de retard). |
+| `quantity` | entier | Quantité empruntée (1). |
 
-## Dimensions principales
+## `FACT_RESERVATION` (grain : une réservation)
 
-- `DIM_DATE` : calendrier académique, mois, trimestre, année, période d'examen.
-- `DIM_BOOK` : livre, auteur, catégorie, niveau académique, popularité simulée.
-- `DIM_CATEGORY` : catégories et sous-catégories.
-- `DIM_BRANCH` : bibliothèques, villes, pays, type d'établissement.
-- `DIM_USER` : usagers, type, faculté, niveau académique, pays.
+| Colonne | Type | Description |
+|---|---|---|
+| `reservation_id` | texte | Clé technique de la réservation. |
+| `date_id` | entier | Clé de date (→ `DIM_DATE`). |
+| `event_date` | date | Date de la réservation. |
+| `user_id` | entier | Clé usager (→ `DIM_USER`). |
+| `book_id` | entier | Clé livre (→ `DIM_BOOK`). |
+| `branch_id` | entier | Clé branche (→ `DIM_BRANCH`). |
+| `category_id` | entier | Clé catégorie (→ `DIM_CATEGORY`). |
+| `reservation_status` | texte | `fulfilled`, `pending` ou `cancelled`. |
+| `wait_days` | entier | Délai d'attente avant satisfaction / abandon. |
+| `quantity` | entier | Quantité réservée (1). |
+
+## `FACT_INVENTORY_SNAPSHOT` (grain : livre × branche × mois)
+
+| Colonne | Type | Description |
+|---|---|---|
+| `snapshot_id` | texte | Clé technique du snapshot. |
+| `date_id` | entier | Date du snapshot (fin de mois, → `DIM_DATE`). |
+| `snapshot_date` | date | Date du snapshot (lisible). |
+| `book_id` | entier | Clé livre (→ `DIM_BOOK`). |
+| `branch_id` | entier | Clé branche (→ `DIM_BRANCH`). |
+| `category_id` | entier | Clé catégorie (→ `DIM_CATEGORY`). |
+| `total_copies` | entier | Exemplaires alloués à ce livre dans cette branche. |
+| `available_copies` | entier | Exemplaires disponibles au moment du snapshot. |
+| `active_loans` | entier | Exemplaires actuellement empruntés. |
+| `utilization_rate` | décimal | `active_loans / total_copies` (0 à 1). |
+| `availability_rate` | décimal | `available_copies / total_copies` (0 à 1). |
+| `out_of_stock` | booléen | `True` si `available_copies = 0`. |
+| `loan_count_total` | entier | Emprunts cumulés sur ce couple livre × branche. |
+| `loan_count_120d` | entier | Emprunts sur les 120 jours précédant le snapshot. |
+| `unsatisfied_reservations` | entier | Demande non satisfaite estimée (copies manquantes). |
+| `reallocation_priority` | texte | `Critique`, `Élevée`, `Normale`, `Faible`. |
+
+## Dimensions
+
+- `DIM_DATE` : calendrier académique (mois, trimestre, année, période d'examen, période académique).
+- `DIM_BOOK` : livre, auteur, catégorie, niveau académique, langue, `demand_tier`, `base_total_copies`, `popularity_score`. **Plus de colonnes d'inventaire.**
+- `DIM_CATEGORY` : catégorie, sous-catégorie, cluster disciplinaire.
+- `DIM_BRANCH` : bibliothèque, ville, pays, type, coordonnées, profil.
+- `DIM_USER` : usager, type (`Student`/`Researcher`/`Faculty`), faculté, niveau, pays, branche préférée.

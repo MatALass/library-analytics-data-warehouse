@@ -1,37 +1,78 @@
-// Raphaël — Pages 1 & 2
-// Version une seule table de faits : FACT_LIBRARY.
+// ===========================================================================
+// raphael_pages_1_2.dax
+// Page 1 : Vue d'ensemble des emprunts (volume, tendance, croissance)
+// Page 2 : Analyse temporelle & periode d'examens
+// ---------------------------------------------------------------------------
+// Depend des mesures de mesures_validees_modele_commun.dax (ex. [Total Emprunts]).
+// DIM_DATE marquee comme table de dates sur [full_date].
+// ===========================================================================
 
-DEFINE
-    MEASURE 'FACT_LIBRARY'[Total Emprunts] =
-        CALCULATE ( COUNTROWS ( 'FACT_LIBRARY' ), 'FACT_LIBRARY'[event_type] = "loan" )
 
-    MEASURE 'FACT_LIBRARY'[Emprunteurs Actifs] =
-        CALCULATE ( DISTINCTCOUNT ( 'FACT_LIBRARY'[user_id] ), 'FACT_LIBRARY'[event_type] = "loan" )
+// =========================== PAGE 1 — VUE D'ENSEMBLE =======================
 
-    MEASURE 'FACT_LIBRARY'[Durée Moyenne de Prêt] =
-        CALCULATE ( AVERAGE ( 'FACT_LIBRARY'[loan_duration_days] ), 'FACT_LIBRARY'[event_type] = "loan" )
+Emprunts Moyens par Jour =
+DIVIDE ( [Total Emprunts], COUNTROWS ( DIM_DATE ) )
+// moyenne sur le calendrier en contexte (jours ouvres + week-ends)
 
-    MEASURE 'FACT_LIBRARY'[Total Exemplaires] =
-        CALCULATE ( SUM ( 'FACT_LIBRARY'[total_copies] ), 'FACT_LIBRARY'[event_type] = "inventory_snapshot", REMOVEFILTERS ( 'DIM_DATE' ) )
+Emprunts YTD =
+TOTALYTD ( [Total Emprunts], DIM_DATE[full_date] )
 
-    MEASURE 'FACT_LIBRARY'[Exemplaires Disponibles] =
-        CALCULATE ( SUM ( 'FACT_LIBRARY'[available_copies] ), 'FACT_LIBRARY'[event_type] = "inventory_snapshot", REMOVEFILTERS ( 'DIM_DATE' ) )
+Emprunts Annee Precedente =
+CALCULATE ( [Total Emprunts], SAMEPERIODLASTYEAR ( DIM_DATE[full_date] ) )
 
-    MEASURE 'FACT_LIBRARY'[Taux de Disponibilité Global] =
-        DIVIDE ( [Exemplaires Disponibles], [Total Exemplaires] )
+Croissance Emprunts YoY % =
+VAR Prec = [Emprunts Annee Precedente]
+RETURN DIVIDE ( [Total Emprunts] - Prec, Prec )
 
-    MEASURE 'FACT_LIBRARY'[Emprunts Période Examen] =
-        CALCULATE ( [Total Emprunts], 'DIM_DATE'[is_exam_period] = TRUE () )
+Emprunts Mois Precedent =
+CALCULATE ( [Total Emprunts], DATEADD ( DIM_DATE[full_date], -1, MONTH ) )
 
-    MEASURE 'FACT_LIBRARY'[Emprunts Hors Examen] =
-        CALCULATE ( [Total Emprunts], 'DIM_DATE'[is_exam_period] = FALSE () )
+Variation Emprunts MoM % =
+VAR Prec = [Emprunts Mois Precedent]
+RETURN DIVIDE ( [Total Emprunts] - Prec, Prec )
 
-    MEASURE 'FACT_LIBRARY'[Ratio Examen vs Hors Examen] =
-        DIVIDE ( [Emprunts Période Examen], [Emprunts Hors Examen] )
+Cumul Emprunts (running) =
+CALCULATE (
+    [Total Emprunts],
+    FILTER ( ALL ( DIM_DATE ), DIM_DATE[full_date] <= MAX ( DIM_DATE[full_date] ) )
+)
 
-EVALUATE
-SUMMARIZECOLUMNS (
-    'DIM_DATE'[year_month],
-    "Emprunts", [Total Emprunts],
-    "Emprunts examen", [Emprunts Période Examen]
+
+// =========================== PAGE 2 — TEMPOREL & EXAMENS ===================
+
+Emprunts Periode Examens =
+CALCULATE ( [Total Emprunts], DIM_DATE[is_exam_period] = TRUE () )
+
+Emprunts Hors Examens =
+CALCULATE ( [Total Emprunts], DIM_DATE[is_exam_period] = FALSE () )
+
+Part Emprunts en Examens % =
+DIVIDE ( [Emprunts Periode Examens], [Total Emprunts] )
+
+// nb de jours d'examen / hors examen dans le contexte
+_Jours Examens =
+CALCULATE ( COUNTROWS ( DIM_DATE ), DIM_DATE[is_exam_period] = TRUE () )
+
+_Jours Hors Examens =
+CALCULATE ( COUNTROWS ( DIM_DATE ), DIM_DATE[is_exam_period] = FALSE () )
+
+Emprunts par Jour (Examens) =
+DIVIDE ( [Emprunts Periode Examens], [_Jours Examens] )
+
+Emprunts par Jour (Hors Examens) =
+DIVIDE ( [Emprunts Hors Examens], [_Jours Hors Examens] )
+
+// LE signal cle de la page 2 : surintensite des examens.
+// A croiser avec DIM_CATEGORY pour montrer l'effet d'interaction
+// (Droit / Sante / Data ~x2.8 ; Lettres / SHS ~x1.7).
+Indice Surintensite Examens =
+DIVIDE ( [Emprunts par Jour (Examens)], [Emprunts par Jour (Hors Examens)] )
+
+// emprunts par periode academique (Rentree / Examens / Hors examens / Vacances ete)
+// -> a mettre directement avec DIM_DATE[academic_period] en axe, pas besoin de mesure dediee.
+
+Emprunts Week-end % =
+DIVIDE (
+    CALCULATE ( [Total Emprunts], DIM_DATE[is_weekend] = TRUE () ),
+    [Total Emprunts]
 )
