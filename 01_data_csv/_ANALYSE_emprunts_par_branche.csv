@@ -1,7 +1,0 @@
-branch_id,loan_count,branch_name,city,country,branch_type
-1,4018,Bibliothèque Paris-Centre,Paris,France,Université
-2,2872,Campus LyonTech,Lyon,France,École
-5,2518,ULB Bruxelles Sciences,Bruxelles,Belgique,Université
-3,1829,IUT Lille Médiathèque,Lille,France,IUT
-4,1179,BUT Marseille Bibliothèque,Marseille,France,BUT
-6,1048,Campus Liège Recherche,Liège,Belgique,Université

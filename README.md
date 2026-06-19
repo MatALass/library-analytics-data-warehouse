@@ -1,69 +1,73 @@
-# Library-Analytics-Data-Warehouse
+# Library Analytics — Projet Power BI (équipe)
 
-Projet Power BI d'analyse d'un réseau de bibliothèques académiques (France + Belgique).
-Modèle en **constellation** : 3 tables de faits partageant 5 dimensions communes.
-
-## Modèle
-
-```
-                          DIM_DATE
-                             │
-   DIM_USER ── FACT_LOAN ────┼──── FACT_RESERVATION ── DIM_USER
-        │          │         │            │
-   DIM_BOOK ───────┼─────────┼────────────┼──── DIM_BOOK
-        │          │         │            │
-  DIM_BRANCH ──────┘         │            └──── DIM_BRANCH
-        │                    │
-  DIM_CATEGORY ──────────────┴──── FACT_INVENTORY_SNAPSHOT ── DIM_BOOK / DIM_BRANCH / DIM_CATEGORY / DIM_DATE
-```
-
-| Table de faits | Grain | Clé technique |
-|---|---|---|
-| `FACT_LOAN` | 1 emprunt | `loan_id` |
-| `FACT_RESERVATION` | 1 réservation | `reservation_id` |
-| `FACT_INVENTORY_SNAPSHOT` | 1 état de stock livre × branche × mois | `snapshot_id` |
-
-Dimensions partagées : `DIM_DATE`, `DIM_BOOK`, `DIM_BRANCH`, `DIM_CATEGORY`, `DIM_USER`.
-
-## Pourquoi 3 facts (et plus une seule)
-
-`loan` et `reservation` sont des événements transactionnels ; `inventory_snapshot`
-est un état périodique (grain livre × branche × mois, sans usager). Mélanger les
-deux natures dans une fact unique imposait une moitié de colonnes vides par ligne
-et des colonnes « fuyantes » entre types. Le découpage en facts transactionnelles
-+ fact de snapshot périodique est le pattern Kimball standard et supprime ces
-défauts. Voir `05_documentation/SCHEMA_ETOILE.md`.
+Réseau de bibliothèques académiques FR/BE. Dashboard Power BI à 6 pages, modèle en
+**constellation** (3 facts + 5 dimensions). Organisation **par personne** pour que
+chacun avance sans dépendre des autres.
 
 ## Structure
 
 ```
-library-analytics-data-warehouse/
-├── 00_modele_commun/              # .pbix commun (à reconstruire sur le modèle 3-facts)
-├── 01_data_csv/                   # CSV à importer dans Power BI (UTF-8, sans BOM)
-├── 02_mesures_dax/                # mesures DAX
-├── 03_rapports_individuels/       # pages par contributeur
-├── 04_livrable_final/
-├── 05_documentation/              # schéma, dictionnaire, patterns, relations
-└── generator/                     # générateur reproductible des données
+library-analytics-projet/
+├── 0_MODELE_COMMUN/          ← TOUT LE MONDE COMMENCE ICI
+│   ├── COMMENCER_ICI.md          guide de démarrage + pièges
+│   ├── MODELE_pages_5_6.pbix     fichier de départ (modèle + mesures + pages 5-6)
+│   ├── mesures_base.dax          mesures partagées (déjà dans le pbix)
+│   ├── data_csv/                 les 8 CSV (déjà importés dans le pbix)
+│   ├── SCHEMA_constellation.md   le modèle expliqué
+│   ├── RELATIONS_POWERBI.md      les 14 relations
+│   └── DICTIONNAIRE_DONNEES.md   description des colonnes
+│
+├── RAPHAEL_pages_1_2/        ← Raphaël : INSTRUCTIONS.md + mesures_raphael.dax
+├── SAMUEL_pages_3_4/         ← Samuel  : INSTRUCTIONS.md + mesures_samuel.dax
+├── MATHIEU_pages_5_6/        ← Mathieu : FAIT (référence)
+│
+├── PATTERNS_ANALYTIQUES.md   ce que les données contiennent (tendances + chiffres)
+└── generator/                générateur reproductible des données (seed fixe)
 ```
 
-## Données
+## Comment ça marche (workflow)
 
-Les CSV de `01_data_csv/` sont **générés** par `generator/generate_data.py`
-(seed fixe, reproductible). Des tendances analytiques sont injectées
-volontairement — voir `05_documentation/PATTERNS_ANALYTIQUES.md` pour la liste
-de ce qu'on peut mettre en avant dans l'analyse.
+1. **Chacun ouvre `0_MODELE_COMMUN/MODELE_pages_5_6.pbix`** et l'enregistre sous
+   son nom dans son dossier. Le modèle, les relations, les types et les mesures de
+   base sont **déjà faits** — personne ne refait le modèle.
+2. **Chacun lit son `INSTRUCTIONS.md`** : ses pages, les questions à traiter, la
+   réponse attendue, la maquette, ses mesures à créer.
+3. **Chacun construit ses 2 pages** dans sa copie.
+4. **Intégration finale** (voir ci-dessous).
 
-Pour régénérer :
+## Les 12 questions, réparties
 
-```powershell
+| Pages | Qui | Questions |
+|---|---|---|
+| 1–2 | Raphaël | Q1 volume/croissance, Q2 hub émergent, Q3 saisonnalité, Q4 examens × catégorie |
+| 3–4 | Samuel | Q5 charge des branches, Q6 retards par profil, Q7 coût des retards |
+| 5–6 | Mathieu | Q8 livres à prioriser, Q9 demande refoulée, Q10 tension stock, Q11/Q12 réallocation |
+
+Détail et réponses attendues dans chaque `INSTRUCTIONS.md`.
+
+## Intégration finale (important : Power BI ne se fusionne pas comme du code)
+
+On ne « merge » pas trois `.pbix`. La méthode :
+1. On part de **MODELE_pages_5_6.pbix** comme fichier **maître** (il a déjà les
+   pages 5-6).
+2. Raphaël et Samuel ouvrent leur fichier ET le maître côte à côte. Sur chaque
+   page, ils **sélectionnent tous les visuels** (Ctrl+A), **copient** (Ctrl+C),
+   puis **collent** dans une nouvelle page du maître (Ctrl+V).
+3. Si une mesure manque après collage, on la récrée depuis le fichier
+   `mesures_*.dax` correspondant (toutes les mesures vivent dans la table `_Mesures`).
+4. Une fois les 6 pages dans le maître : passe d'harmonisation (thème, titres,
+   formats, slicers) et **QA croisée** (chacun relit les pages des autres contre
+   les questions).
+
+Décider **dès maintenant** qui détient le fichier maître pour éviter les
+divergences.
+
+## Régénérer les données (optionnel)
+
+```
 cd generator
 pip install pandas numpy
 python generate_data.py
 ```
-
-## Répartition des pages
-
-- Raphaël : pages 1 et 2.
-- Samuel : pages 3 et 4.
-- Mathieu : pages 5 et 6.
+Seed fixe → mêmes données. Les tendances injectées sont documentées dans
+`PATTERNS_ANALYTIQUES.md`.
