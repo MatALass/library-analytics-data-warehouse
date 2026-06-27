@@ -1,0 +1,192 @@
+// ===========================================================================
+// 03_mathieu_pages_5_6_EN.dax
+// Page 5: Catalogue & reservations (book Pareto, demand, fulfilment)
+// Page 6: Stock & prescriptive reallocation engine  <-- differentiator
+// ---------------------------------------------------------------------------
+// Depends on 00_base_measures_EN.dax (incl. [_Last Snapshot Date]).
+//
+// PAGE 6 — SNAPSHOT GOLDEN RULE:
+//   FACT_INVENTORY_SNAPSHOT is a monthly snapshot. DO NOT SUM across time.
+//   Two families below:
+//     (a) "... (Month)"      -> SUM is correct ONLY IF a single month is in
+//                               context (month on axis, or slicer on one month).
+//     (b) "... (Last Month)" -> pins the latest snapshot via the helper, for
+//                               "current state" KPI cards. Do NOT put month on
+//                               the axis with these.
+//
+// DISPLAY FOLDERS (table _Mesures): each measure carries a "// FOLDER: ..."
+// tag. Power BI display folders nest with a backslash "\". Set them in the
+// Properties pane (Display folder) or run tools/apply_display_folders_TE2.cs
+// in Tabular Editor to apply them all at once. IMPORTANT (data coupling):
+// reallocation_priority values are now in ENGLISH (Critical/High/Normal/Low),
+// so the literals below read "Critical" and "Low". If you have NOT yet
+// translated the data, keep "Critique"/"Faible" here instead.
+// ===========================================================================
+
+
+// =========================== PAGE 5 — CATALOGUE & RESERVATIONS =============
+
+// --- Book Pareto ---  FOLDER: 5 Catalogue & Demand\Pareto
+Book Rank =
+// FOLDER: 5 Catalogue & Demand\Pareto
+IF (
+    HASONEVALUE ( DIM_BOOK[book_id] ),
+    RANKX ( ALL ( DIM_BOOK[book_id] ), [Total Loans],, DESC, DENSE )
+)
+
+Cumulative Loans % (Pareto) =
+// FOLDER: 5 Catalogue & Demand\Pareto
+VAR T = ADDCOLUMNS ( ALL ( DIM_BOOK[book_id] ), "@l", [Total Loans] )
+VAR Cur = [Total Loans]
+VAR CumLoans = SUMX ( FILTER ( T, [@l] >= Cur ), [@l] )
+VAR Grand = SUMX ( T, [@l] )
+RETURN DIVIDE ( CumLoans, Grand )
+
+// card: loan share captured by the top 20% most-demanded books (~44%)
+Top 20% Books Loan Share % =
+// FOLDER: 5 Catalogue & Demand\Pareto
+VAR N = COUNTROWS ( ALL ( DIM_BOOK[book_id] ) )
+VAR TopN = ROUNDUP ( N * 0.2, 0 )
+VAR T = ADDCOLUMNS ( ALL ( DIM_BOOK[book_id] ), "@l", [Total Loans] )
+VAR TopBooks = TOPN ( TopN, T, [@l], DESC )
+RETURN DIVIDE ( SUMX ( TopBooks, [@l] ), SUMX ( T, [@l] ) )
+
+// --- reservations ---  FOLDER: 5 Catalogue & Demand\Reservations
+Reservation Fulfillment Rate % =
+// FOLDER: 5 Catalogue & Demand\Reservations
+DIVIDE ( [Fulfilled Reservations], [Total Reservations] )
+
+Reservation Cancel Rate % =
+// FOLDER: 5 Catalogue & Demand\Reservations
+DIVIDE ( [Cancelled Reservations], [Total Reservations] )
+
+Avg Reservation Wait (days) =
+// FOLDER: 5 Catalogue & Demand\Reservations
+AVERAGE ( FACT_RESERVATION[wait_days] )
+
+// unmet-demand indicator: higher = the book/branch is more stuck
+Demand Pressure (Resv per Loan) =
+// FOLDER: 5 Catalogue & Demand\Reservations
+DIVIDE ( [Total Reservations], [Total Loans] )
+
+
+// =========================== PAGE 6 — STOCK & REALLOCATION =================
+
+// --- stock state, latest snapshot (KPI cards) ---  FOLDER: 6 Stock & Reallocation\Stock State (Last Month)
+
+Total Copies (Last Month) =
+// FOLDER: 6 Stock & Reallocation\Stock State (Last Month)
+VAR d = [_Last Snapshot Date]
+RETURN
+CALCULATE (
+    SUM ( FACT_INVENTORY_SNAPSHOT[total_copies] ),
+    FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d )
+)
+
+Available Copies (Last Month) =
+// FOLDER: 6 Stock & Reallocation\Stock State (Last Month)
+VAR d = [_Last Snapshot Date]
+RETURN
+CALCULATE (
+    SUM ( FACT_INVENTORY_SNAPSHOT[available_copies] ),
+    FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d )
+)
+
+Avg Utilization (Last Month) =
+// FOLDER: 6 Stock & Reallocation\Stock State (Last Month)
+VAR d = [_Last Snapshot Date]
+RETURN
+CALCULATE (
+    AVERAGE ( FACT_INVENTORY_SNAPSHOT[utilization_rate] ),
+    FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d )
+)
+
+Out-of-Stock Rate % (Last Month) =
+// FOLDER: 6 Stock & Reallocation\Stock State (Last Month)
+VAR d = [_Last Snapshot Date]
+RETURN
+CALCULATE (
+    DIVIDE (
+        CALCULATE (
+            COUNTROWS ( FACT_INVENTORY_SNAPSHOT ),
+            FACT_INVENTORY_SNAPSHOT[out_of_stock] = TRUE ()
+        ),
+        COUNTROWS ( FACT_INVENTORY_SNAPSHOT )
+    ),
+    FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d )
+)
+
+// --- "Month" versions for time curves (put month on the axis) ---  FOLDER: 6 Stock & Reallocation\Stock Trend (Month)
+
+Avg Utilization (Month) =
+// FOLDER: 6 Stock & Reallocation\Stock Trend (Month)
+AVERAGE ( FACT_INVENTORY_SNAPSHOT[utilization_rate] )
+
+Unsatisfied Reservations (Month) =
+// FOLDER: 6 Stock & Reallocation\Stock Trend (Month)
+SUM ( FACT_INVENTORY_SNAPSHOT[unsatisfied_reservations] )
+
+
+// --- REALLOCATION ENGINE (the heart of the page) ---  FOLDER: 6 Stock & Reallocation\Reallocation Engine
+
+// book x branch pairs in critical tension at the latest snapshot
+Critical Pairs (Last Month) =
+// FOLDER: 6 Stock & Reallocation\Reallocation Engine
+VAR d = [_Last Snapshot Date]
+RETURN
+CALCULATE (
+    COUNTROWS ( FACT_INVENTORY_SNAPSHOT ),
+    FACT_INVENTORY_SNAPSHOT[reallocation_priority] = "Critical",
+    FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d )
+)
+
+// unmet demand at the latest snapshot (missing copies)
+Unsatisfied Demand (Last Month) =
+// FOLDER: 6 Stock & Reallocation\Reallocation Engine
+VAR d = [_Last Snapshot Date]
+RETURN
+CALCULATE (
+    SUM ( FACT_INVENTORY_SNAPSHOT[unsatisfied_reservations] ),
+    FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d )
+)
+
+// idle copies: available in Low-priority pairs
+Idle Copies (Last Month) =
+// FOLDER: 6 Stock & Reallocation\Reallocation Engine
+VAR d = [_Last Snapshot Date]
+RETURN
+CALCULATE (
+    SUM ( FACT_INVENTORY_SNAPSHOT[available_copies] ),
+    FACT_INVENTORY_SNAPSHOT[reallocation_priority] = "Low",
+    FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d )
+)
+
+// TRULY movable copies: keep 1 safety copy per pair
+Movable Idle Copies (Last Month) =
+// FOLDER: 6 Stock & Reallocation\Reallocation Engine
+VAR d = [_Last Snapshot Date]
+RETURN
+CALCULATE (
+    SUMX (
+        FACT_INVENTORY_SNAPSHOT,
+        MAX ( FACT_INVENTORY_SNAPSHOT[available_copies] - 1, 0 )
+    ),
+    FACT_INVENTORY_SNAPSHOT[reallocation_priority] = "Low",
+    FACT_INVENTORY_SNAPSHOT[available_copies] >= 2,
+    FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d )
+)
+
+// THE defence number: how much of the unmet demand could be covered just by
+// redistributing existing idle stock?
+Reallocation Coverage Rate % =
+// FOLDER: 6 Stock & Reallocation\Reallocation Engine
+DIVIDE (
+    [Movable Idle Copies (Last Month)],
+    [Unsatisfied Demand (Last Month)]
+)
+
+// For the "reallocation table" visual: put DIM_BOOK[title] and
+// DIM_BRANCH[branch_name] on rows, column FACT_INVENTORY_SNAPSHOT
+// [reallocation_priority] + the Available / Unsatisfied measures.
+// Filter on the last month. Direct read: Critical with unmet demand on one
+// side, Low with available copies on the other = transfer order.

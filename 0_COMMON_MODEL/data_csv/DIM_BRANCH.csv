@@ -1,0 +1,7 @@
+branch_id,branch_name,city,country,branch_type,department,latitude,longitude,branch_profile
+1,Paris-Centre Library,Paris,France,University,Île-de-France,48.8566,2.3522,Very high activity: data/law students
+2,LyonTech Campus,Lyon,France,School,Auvergne-Rhône-Alpes,45.764,4.8357,High activity: engineering and BI
+3,Lille IUT Media Library,Lille,France,IUT,Hauts-de-France,50.6292,3.0573,Medium activity: BUT/IUT
+4,Marseille BUT Library,Marseille,France,BUT,Provence-Alpes-Côte d’Azur,43.2965,5.3698,Low availability on practical books
+5,ULB Brussels Sciences,Brussels,Belgium,University,Brussels-Capital,50.8503,4.3517,Very high activity: research and health
+6,Liège Research Campus,Liège,Belgium,University,Wallonia,50.6326,5.5797,Specialised research activity

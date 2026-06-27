@@ -1,0 +1,10 @@
+category_id,category,subcategory,discipline_cluster
+1,Data Science & AI,Machine Learning,Digital
+2,Business Intelligence,Power BI / Reporting,Digital
+3,Data Engineering,ETL / Data Warehouse,Digital
+4,Statistics,Quantitative Analysis,Digital
+5,Law,Public / Private Law,Social Sciences
+6,Health,Medicine / Public Health,Health
+7,Economics & Management,Finance / Management,Management
+8,Humanities,Sociology / Psychology,Social Sciences
+9,Literature,Novels / Essays,Letters

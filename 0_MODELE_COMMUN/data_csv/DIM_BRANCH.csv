@@ -1,7 +1,0 @@
-branch_id,branch_name,city,country,branch_type,department,latitude,longitude,branch_profile
-1,Bibliothèque Paris-Centre,Paris,France,Université,Île-de-France,48.8566,2.3522,Très forte activité : étudiants data/droit
-2,Campus LyonTech,Lyon,France,École,Auvergne-Rhône-Alpes,45.764,4.8357,Forte activité : engineering et BI
-3,IUT Lille Médiathèque,Lille,France,IUT,Hauts-de-France,50.6292,3.0573,Activité moyenne : BUT/IUT
-4,BUT Marseille Bibliothèque,Marseille,France,BUT,Provence-Alpes-Côte d’Azur,43.2965,5.3698,Faible disponibilité sur ouvrages pratiques
-5,ULB Bruxelles Sciences,Bruxelles,Belgique,Université,Bruxelles-Capitale,50.8503,4.3517,Très forte activité : recherche et santé
-6,Campus Liège Recherche,Liège,Belgique,Université,Wallonie,50.6326,5.5797,Activité recherche spécialisée
