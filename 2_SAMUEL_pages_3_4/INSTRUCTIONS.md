@@ -1,7 +1,6 @@
 # INSTRUCTIONS — Samuel (pages 3 et 4)
 
-> Avant de commencer : lis `0_MODELE_COMMUN/COMMENCER_ICI.md`, ouvre
-> `MODELE_pages_5_6.pbix`, enregistre-le sous ton nom. Le modèle est déjà fait.
+> Avant de commencer : ouvre `library_analytics.pbix`, enregistre-le sous ton nom. Le modèle est déjà fait.
 
 Tu construis **2 pages** : une sur le réseau (branches), une sur les usagers et
 les retards. Pour chaque question, la **réponse attendue** est indiquée.
@@ -99,16 +98,4 @@ Médecine) concentrent les emprunts.
 Toutes dans `mesures_samuel.dax` (table `_Mesures`). Les mesures de base
 existent déjà dans le pbix, ne les recrée pas.
 
-À créer : `Part Emprunts Branche %`, `Rang Branche`, `Charge Moyenne Branche (empr/j)`,
-`Croissance Branche YoY %`, `Taux Annulation Réservations Branche %`,
-`Attente Moyenne Branche (j)`, `Emprunts par Usager`, `Emprunts En Retard`,
-`Taux de Retard %`, `Retard Moyen (jours, retards seuls)`, `Jours de Retard Cumulés`,
-`Pénalités Totales`, `Pénalité Moyenne par Usager`, `Durée Moyenne de Prêt (j)`,
-`Taux d'Activité Usagers %`.
-
-## Rappels
-
-- `Pénalités Totales` → formate en **€**. `Taux de Retard %` → en **%**.
-- `Taux de Retard %` se rapporte aux emprunts **clôturés** (un emprunt en cours
-  n'est pas « en retard »). C'est volontaire.
-- `year_month` en axe → champ simple, pas la hiérarchie de dates.
+Tout doit être fait en anglais.
