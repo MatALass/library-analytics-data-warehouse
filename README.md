@@ -11,7 +11,7 @@
 [![Model](https://img.shields.io/badge/Model-Constellation_(3_facts_·_5_dims)-2ea44f)](#-architecture--star-constellation-schema)
 [![Reproducible](https://img.shields.io/badge/Data-Reproducible_(seed_42)-blue)](#-data-generator)
 [![Language](https://img.shields.io/badge/Language-English-informational)]()
-[![Status](https://img.shields.io/badge/Status-Work_in_progress-orange)](#-project-status)
+[![Status](https://img.shields.io/badge/Status-Complete-2ea44f)](#-project-status)
 
 </div>
 
@@ -38,21 +38,23 @@ injected, correlated trends** so every page tells a piece of one coherent story:
 
 ```
 library-analytics-data-warehouse/
-├── README.md                         ← you are here (single source of truth)
-├── 0_COMMON_MODEL/
-│   ├── library_analytics.pbix        ← THE master report (model + 6 pages)
-│   ├── 00_base_measures_EN.dax       shared base measures
-│   └── data_csv/                     the 8 CSVs (English, loaded by the .pbix)
-├── 1_RAPHAEL_pages_1_2/01_raphael_pages_1_2_EN.dax
-├── 2_SAMUEL_pages_3_4/02_samuel_pages_3_4_EN.dax  (+ INSTRUCTIONS.md)
-├── 3_MATHIEU_pages_5_6/03_mathieu_pages_5_6_EN.dax
-└── 4_generator/
-    ├── generate_data.py              reproducible generator (writes English CSVs)
-    └── source_dimensions/            hand-authored dimension sources
+├── README.md                     ← you are here (single source of truth)
+├── library_analytics.pbix        ← THE master report (model + 6 pages, data embedded)
+├── data/                         the 8 English CSVs loaded by the .pbix
+│   ├── DIM_DATE.csv  DIM_BOOK.csv  DIM_BRANCH.csv  DIM_CATEGORY.csv  DIM_USER.csv
+│   └── FACT_LOAN.csv  FACT_RESERVATION.csv  FACT_INVENTORY_SNAPSHOT.csv
+├── generate_data.py              reproducible generator (writes the English CSVs)
+└── source_dimensions/            hand-authored dimension sources (input to the generator)
+    └── DIM_DATE.csv  DIM_BOOK.csv  DIM_BRANCH.csv  DIM_CATEGORY.csv  DIM_USER.csv
 ```
 
-All measures live in a dedicated `_Mesures` table, organised into per-page display
-folders. The whole model — columns, measures, data values — is in **English**.
+The `.pbix` opens **standalone** — the data is imported (embedded), so no CSV is needed
+just to view the report. The CSVs and generator are kept for **reproducibility** and to
+support a data **Refresh**.
+
+All measures live in a dedicated `_Measures` table, organised into per-page display
+folders (`00 - Common Model`, `01 - Page 1` … `06 - Page 6`). The whole model —
+columns, measures, data values — is in **English**.
 
 ---
 
@@ -117,7 +119,9 @@ Each relationship: **one-to-many (1:\*)**, cross-filter **Single** (dimension fi
 >   (snowflake) path and Power BI silently **deactivates** the three direct
 >   fact→category relationships — category visuals then stop filtering.
 > - **Mark `DIM_DATE` as a date table** on `full_date` (enables time intelligence:
->   YoY, MoM, YTD). Turn off **Auto date/time** to avoid hidden auto date tables.
+>   YoY, MoM, YTD). **Auto date/time is off** to avoid hidden auto date tables.
+> - **CSV encoding = UTF-8 (65001).** The generator writes UTF-8; every Power Query
+>   import must read `Encoding=65001` or accented cities (e.g. *Liège*) get mojibaked.
 > - **`return_date` blank** in `FACT_LOAN` = loan still open. Normal, not an error.
 > - **Snapshot ≠ sum:** never sum `FACT_INVENTORY_SNAPSHOT` columns across time. Aggregate
 >   within a month, and pin the latest snapshot for "current state" KPIs.
@@ -222,33 +226,35 @@ Trends are injected on purpose and **correlated** (measured on seed 42):
 ## 🛠️ Data generator
 
 Reproducible (fixed seed). Generates French internally (trend logic), writes **English**
-CSVs directly to the model folder. One file — no separate translation step.
+UTF-8 CSVs straight into `data/`. One file — no separate translation step.
 
 ```powershell
-cd 4_generator
-pip install pandas numpy
-python generate_data.py                       # -> ../0_COMMON_MODEL/data_csv/ (English)
-python generate_data.py --seed 42 --out ../0_COMMON_MODEL/data_csv
-python generate_data.py --keep-french         # raw FR (debug only)
+# run from the repository root
+pip install -r requirements.txt   # pandas + numpy
+python generate_data.py                        # -> ./data/ (English, UTF-8)
+python generate_data.py --seed 42 --out ./data
+python generate_data.py --keep-french          # raw FR (debug only)
 ```
 
 The script prints sanity checks (16,000 loans · 3,600 reservations · 124 critical pairs ·
 353 unmet · ~32.29 % coverage). Trend dictionaries (demand weights, branch tension,
 exam sensitivity, faculty→category affinity, loan policy) sit at the top of `build()` —
-tweak and rerun.
+tweak and rerun. Inputs are read from `source_dimensions/`.
 
 ---
 
 ## 🔁 Reproduce the report
 
-1. Open `0_COMMON_MODEL/library_analytics.pbix` in Power BI Desktop.
-2. If you regenerate data, **Refresh** (column names are stable → relationships, types
+1. Open `library_analytics.pbix` in Power BI Desktop (data is embedded — it opens as-is).
+2. If you regenerate data, point the Power Query parameter `DataFolder` at your local
+   `data` folder, then **Refresh** (column names are stable → relationships, types
    and measures survive).
 3. Verify the sanity figures: `Total Loans` = 16,000 · `Total Reservations` = 3,600 ·
    `Critical Pairs (Last Month)` = 124 · `Reallocation Coverage Rate %` ≈ 32.29 %.
 
-> **Portability:** the CSV source path is a Power Query parameter `DataFolder`. Set it to
-> your local `0_COMMON_MODEL/data_csv` path after cloning.
+> **Portability:** the CSV source path is a Power Query parameter `DataFolder`. After
+> cloning, set it to the absolute path of this repo's `data` folder (needed only to
+> **Refresh** — not to view the report).
 
 ---
 
@@ -258,13 +264,13 @@ tweak and rerun.
 |---|---|---|
 | 1 — Overview | Raphaël | ✅ built (EN) |
 | 2 — Time & exams | Raphaël | ✅ built (EN) |
-| 3 — Network & branches | Samuel | ⏳ to build (measures ready) |
-| 4 — Users & overdue | Samuel | ⏳ to build (measures ready) |
+| 3 — Network & branches | Samuel | ✅ built (EN) |
+| 4 — Users & overdue | Samuel | ✅ built (EN) |
 | 5 — Catalogue & demand | Mathieu | ✅ built (EN) |
 | 6 — Stock & reallocation | Mathieu | ✅ built (EN) |
 
-**Remaining:** Samuel's pages 3–4 · final theme/title harmonisation · cross-QA of the 6
-pages against the 12 questions.
+**Status: complete.** All 6 pages built, titles harmonised in English, the 12 questions
+covered, and figures validated against the generator's sanity checks.
 
 ---
 

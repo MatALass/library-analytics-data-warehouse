@@ -6,7 +6,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 DIMS_SRC = HERE / "source_dimensions"                
-DEFAULT_OUT = HERE.parent / "0_COMMON_MODEL" / "data_csv"   
+DEFAULT_OUT = HERE / "data"   
 
 PRIORITY = {"Critique": "Critical", "Élevée": "High", "Normale": "Normal", "Faible": "Low"}
 ACADEMIC_PERIOD = {"Examens": "Exams", "Hors examens": "Off-Exam", "Rentrée": "Back-to-School", "Vacances été": "Summer Break"}
@@ -248,7 +248,7 @@ def build(seed: int):
 
 def main():
     ap = argparse.ArgumentParser(description="Generate the English library-analytics CSVs.")
-    ap.add_argument("--out", default=str(DEFAULT_OUT), help="output folder (default: 0_COMMON_MODEL/data_csv)")
+    ap.add_argument("--out", default=str(DEFAULT_OUT), help="output folder (default: ./data)")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--keep-french", action="store_true", help="write raw French values (debug)")
     a = ap.parse_args()
