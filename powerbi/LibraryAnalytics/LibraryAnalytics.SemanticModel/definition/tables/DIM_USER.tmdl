@@ -1,0 +1,114 @@
+table DIM_USER
+	lineageTag: f73a28f8-3f6c-5b16-8e57-9169fa6350e2
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		lineageTag: d07a6827-e067-5f60-bf76-1e0a2ff9b21d
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_code
+		dataType: string
+		lineageTag: f0c76fd4-b9ce-57fc-b898-7274e35420ba
+		summarizeBy: none
+		sourceColumn: user_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_name
+		dataType: string
+		lineageTag: eef4700f-c806-5274-bfbf-49cd1c963a41
+		summarizeBy: none
+		sourceColumn: first_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_name
+		dataType: string
+		lineageTag: 5a9e5868-f8f5-5213-9d22-b1f602746e0f
+		summarizeBy: none
+		sourceColumn: last_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column full_name
+		dataType: string
+		lineageTag: d4a0c25b-1482-5cf6-bd8c-9a7a1038b5e9
+		summarizeBy: none
+		sourceColumn: full_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_type
+		dataType: string
+		lineageTag: 22fa8515-714a-5c01-839e-6695ef68c92a
+		summarizeBy: none
+		sourceColumn: user_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column faculty
+		dataType: string
+		lineageTag: e32b00fa-8597-5c1e-a3b7-f556190097b8
+		summarizeBy: none
+		sourceColumn: faculty
+
+		annotation SummarizationSetBy = Automatic
+
+	column academic_level
+		dataType: string
+		lineageTag: 8f441181-3bf6-51c8-b9bf-1568007c558e
+		summarizeBy: none
+		sourceColumn: academic_level
+
+		annotation SummarizationSetBy = Automatic
+
+	column country
+		dataType: string
+		lineageTag: 67664ba9-11fd-56a5-b316-3829cf0e5575
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	column preferred_branch_id
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 934cf37e-d4c3-50ef-99fe-2a28139c4fb3
+		summarizeBy: none
+		sourceColumn: preferred_branch_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column enrollment_year
+		dataType: int64
+		formatString: 0
+		lineageTag: 108e5f64-34ad-53d3-80d9-f3fc35234959
+		summarizeBy: none
+		sourceColumn: enrollment_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_active
+		dataType: boolean
+		lineageTag: 0b34044f-9759-5b6d-aec6-b53e4e023304
+		summarizeBy: none
+		sourceColumn: is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DIM_USER = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DIM_USER.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"user_id", Int64.Type}, {"user_code", type text}, {"first_name", type text}, {"last_name", type text}, {"full_name", type text}, {"user_type", type text}, {"faculty", type text}, {"academic_level", type text}, {"country", type text}, {"preferred_branch_id", Int64.Type}, {"enrollment_year", Int64.Type}, {"is_active", type logical}}, "en-US")
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table

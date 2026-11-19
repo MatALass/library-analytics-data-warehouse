@@ -1,0 +1,114 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "ac2887d9dd01e2657859",
+  "position": {
+    "x": 346.48,
+    "y": 196,
+    "z": 9000,
+    "width": 917.52,
+    "height": 273.4,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "lineStackedColumnComboChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_DATE"
+                    }
+                  },
+                  "Property": "year_month"
+                }
+              },
+              "queryRef": "DIM_DATE.year_month",
+              "nativeQueryRef": "year_month"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_INVENTORY_SNAPSHOT"
+                    }
+                  },
+                  "Property": "Unsatisfied Reservations (Month)"
+                }
+              },
+              "queryRef": "FACT_INVENTORY_SNAPSHOT.Unsatisfied Reservations (Month)",
+              "nativeQueryRef": "Unsatisfied Reservations (Month)"
+            }
+          ]
+        },
+        "Y2": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_INVENTORY_SNAPSHOT"
+                    }
+                  },
+                  "Property": "Avg Utilization (Month)"
+                }
+              },
+              "queryRef": "FACT_INVENTORY_SNAPSHOT.Avg Utilization (Month)",
+              "nativeQueryRef": "Avg Utilization (Month)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DIM_DATE"
+                  }
+                },
+                "Property": "year_month"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Monthly Unmet Demand & Utilization'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,67 +1,64 @@
-"""Export the semantic model of library_analytics.pbix to docs/model.md.
+"""Write docs/model.md from powerbi/build_report.py, the source of the report.
 
-A .pbix is a binary file: GitHub cannot show its measures or relationships.
-This script reads them with pbixray and writes a Markdown page, so every DAX
-measure can be read and reviewed without opening Power BI Desktop.
+The measures, relationships and pages are described in code; this page makes
+them readable on GitHub without opening Power BI Desktop.
 
-    pip install -r requirements-dev.txt
+    pip install -r powerbi/requirements.txt
     python tools/export_model.py
 """
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
-from pbixray import PBIXRay
-
 ROOT = Path(__file__).resolve().parents[1]
-PBIX = ROOT / "library_analytics.pbix"
+sys.path.insert(0, str(ROOT / "powerbi"))
+
+from build_report import DEFAULT_DATA_FOLDER, build_project  # noqa: E402
+
 OUT = ROOT / "docs" / "model.md"
-REVIEW = ROOT / "docs" / "model_review.md"
-
-
-def one_line(dax: str) -> str:
-    return " ".join(str(dax).split())
 
 
 def main() -> None:
-    model = PBIXRay(str(PBIX))
+    project = build_project(DEFAULT_DATA_FOLDER)
     lines = [
         "# Semantic model",
         "",
-        f"Generated from `{PBIX.name}` by `tools/export_model.py`. Do not edit by hand.",
-        "Review notes and fixes to apply in Power BI Desktop: [model_review.md](model_review.md).",
+        "Generated from `powerbi/build_report.py` by `tools/export_model.py`. Do not edit by hand.",
+        "Review notes: [model_review.md](model_review.md).",
         "",
         "## Tables",
         "",
-        "| Table | Columns |",
-        "|---|---|",
+        "| Table | Role | Columns | Measures |",
+        "|---|---|---|---|",
     ]
-    schema = model.schema
-    for table in model.tables:
-        cols = schema.loc[schema["TableName"] == table, "ColumnName"].tolist()
-        lines.append(f"| `{table}` | {len(cols)} |")
+    for t in project.tables:
+        lines.append(f"| `{t.name}` | {t.role.value} | {len(t.columns)} | {len(t.measures)} |")
 
-    rels = model.relationships
-    lines += ["", f"## Relationships ({len(rels)})", "", "| From (many) | To (one) | Active | Filter |", "|---|---|---|---|"]
-    for _, r in rels.iterrows():
-        lines.append(
-            f"| `{r.FromTableName}[{r.FromColumnName}]` | `{r.ToTableName}[{r.ToColumnName}]` "
-            f"| {'yes' if r.IsActive else 'no'} | {r.CrossFilteringBehavior} |"
-        )
+    lines += ["", f"## Relationships ({len(project.relationships)})", "", "| From (many) | To (one) |", "|---|---|"]
+    for r in project.relationships:
+        lines.append(f"| `{r.from_table}[{r.from_column}]` | `{r.to_table}[{r.to_column}]` |")
 
-    measures = model.dax_measures.copy()
-    measures["DisplayFolder"] = measures["DisplayFolder"].fillna("(no folder)")
+    measures = sorted(project.all_measures(), key=lambda tm: (tm[1].display_folder or "", tm[1].name))
     lines += ["", f"## Measures ({len(measures)})", ""]
-    for folder, group in measures.sort_values(["DisplayFolder", "Name"]).groupby("DisplayFolder", sort=True):
-        lines += [f"### {folder}", "", "| Measure | DAX |", "|---|---|"]
-        for _, m in group.iterrows():
-            dax = one_line(m.Expression).replace("|", "\\|")
-            lines.append(f"| {m.Name} | `{dax}` |")
-        lines.append("")
+    folder = None
+    for table, m in measures:
+        if m.display_folder != folder:
+            folder = m.display_folder
+            lines += ["", f"### {folder}", ""]
+        lines += [f"**{m.name}** (`{table.name}`, format `{m.format_string or 'default'}`)"]
+        if m.description:
+            lines += ["", f"> {m.description}"]
+        lines += ["", "```dax", m.expression, "```", ""]
+
+    lines += ["## Pages", ""]
+    for page in project.pages:
+        titles = [v.title or v.text for v in page.visuals if v.visual_type not in ("slicer", "card", "textbox")]
+        lines.append(f"- **{page.display_name}**: {', '.join(titles)}")
 
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"{OUT.relative_to(ROOT)}: {len(rels)} relationships, {len(measures)} measures")
+    print(f"{OUT.relative_to(ROOT)}: {len(project.relationships)} relationships, {len(measures)} measures")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,47 @@
+table DIM_CATEGORY
+	lineageTag: 7dbe8748-3254-5ac2-b9a7-4cdaea679746
+
+	column category_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 65d4233e-41c5-5c40-bf5d-a87915fe761d
+		summarizeBy: none
+		sourceColumn: category_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 1de43c8f-e258-5a37-baa5-094e669dd297
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column subcategory
+		dataType: string
+		lineageTag: dcb5b525-d483-5783-ac45-5de5c8241900
+		summarizeBy: none
+		sourceColumn: subcategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column discipline_cluster
+		dataType: string
+		lineageTag: a09cc4b2-590c-589b-a961-1d7bd84e943a
+		summarizeBy: none
+		sourceColumn: discipline_cluster
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DIM_CATEGORY = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DIM_CATEGORY.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"category_id", Int64.Type}, {"category", type text}, {"subcategory", type text}, {"discipline_cluster", type text}}, "en-US")
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table

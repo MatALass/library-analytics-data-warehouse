@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "578406e289d1d6b31760",
+  "position": {
+    "x": 961.0,
+    "y": 88,
+    "z": 7000,
+    "width": 303.0,
+    "height": 96,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_INVENTORY_SNAPSHOT"
+                    }
+                  },
+                  "Property": "Reallocation Coverage Rate %"
+                }
+              },
+              "queryRef": "FACT_INVENTORY_SNAPSHOT.Reallocation Coverage Rate %",
+              "nativeQueryRef": "Reallocation Coverage Rate %"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Reallocation Coverage Rate %'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

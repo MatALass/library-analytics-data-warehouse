@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "cca12fc7c5ea2c939897",
+  "position": {
+    "x": 331.0,
+    "y": 88,
+    "z": 6000,
+    "width": 303.0,
+    "height": 96,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_RESERVATION"
+                    }
+                  },
+                  "Property": "Reservation Fulfillment Rate %"
+                }
+              },
+              "queryRef": "FACT_RESERVATION.Reservation Fulfillment Rate %",
+              "nativeQueryRef": "Reservation Fulfillment Rate %"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Reservation Fulfillment Rate %'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

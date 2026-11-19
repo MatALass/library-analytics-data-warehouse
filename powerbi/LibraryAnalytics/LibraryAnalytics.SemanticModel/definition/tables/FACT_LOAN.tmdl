@@ -1,0 +1,356 @@
+table FACT_LOAN
+	lineageTag: 1f2c7c89-a57a-5144-977d-a124a19d463c
+
+	measure 'Total Loans' = COUNTROWS ( FACT_LOAN )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: 4fe0a041-9410-51b5-a326-bcde8aec751a
+
+	measure 'Open Loans' = CALCULATE ( COUNTROWS ( FACT_LOAN ), ISBLANK ( FACT_LOAN[return_date] ) )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: 6ab929b0-9eec-5065-88f5-969ec2207cb3
+
+	measure 'Closed Loans' = CALCULATE ( COUNTROWS ( FACT_LOAN ), NOT ISBLANK ( FACT_LOAN[return_date] ) )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: 468fdd89-eba3-5693-b710-ee39c8e93cdd
+
+	measure 'Loaned Quantity' = SUM ( FACT_LOAN[quantity] )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: 94f92009-1d4d-5dd8-b983-b9161c0cdd48
+
+	measure 'Active Users' = DISTINCTCOUNT ( FACT_LOAN[user_id] )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: 1a6196da-5beb-5aee-a771-2f28f02be4f3
+
+	measure 'Distinct Books Loaned' = DISTINCTCOUNT ( FACT_LOAN[book_id] )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: 88edad09-01d2-5f7a-a70a-fe2c83669618
+
+	measure 'Active Branches' = DISTINCTCOUNT ( FACT_LOAN[branch_id] )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: 64bb95a5-1efa-5c73-b47f-70afa115e051
+
+	measure 'Active Days' = DISTINCTCOUNT ( FACT_LOAN[date_id] )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: 6fe97a9b-4d2d-523c-b564-6a0aa56d35d9
+
+	measure 'Avg Daily Loans' = DIVIDE ( [Total Loans], COUNTROWS ( DIM_DATE ) )
+		formatString: #,0.0
+		displayFolder: 01 - Overview
+		lineageTag: 2d2fa800-a4a8-52ba-aedd-1a141a561f7a
+
+	/// Academic year to date (September to August).
+	measure 'Loans YTD' = TOTALYTD ( [Total Loans], DIM_DATE[full_date], "08-31" )
+		formatString: #,0
+		displayFolder: 01 - Overview
+		lineageTag: 43c231f5-3552-5883-a253-ffeab1733524
+
+	measure 'Loans LY' = CALCULATE ( [Total Loans], SAMEPERIODLASTYEAR ( DIM_DATE[full_date] ) )
+		formatString: #,0
+		displayFolder: 01 - Overview
+		lineageTag: d9b878b6-c5b2-5032-a8b4-83fe16fc37c8
+
+	measure 'Loans YoY %' =
+			VAR Prev = [Loans LY]
+			RETURN DIVIDE ( [Total Loans] - Prev, Prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 01 - Overview
+		lineageTag: 68d376f9-69e5-56ad-a620-a599dffadd7c
+
+	measure 'Loans LM' = CALCULATE ( [Total Loans], DATEADD ( DIM_DATE[full_date], -1, MONTH ) )
+		formatString: #,0
+		displayFolder: 01 - Overview
+		lineageTag: 1c6b9b68-00be-54be-8bf6-db2e33014e75
+
+	measure 'Loans MoM %' =
+			VAR Prev = [Loans LM]
+			RETURN DIVIDE ( [Total Loans] - Prev, Prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 01 - Overview
+		lineageTag: 05a32e41-3761-599a-a44d-b1e3bbf063ca
+
+	measure 'Running Total Loans' = CALCULATE ( [Total Loans], FILTER ( ALL ( DIM_DATE ), DIM_DATE[full_date] <= MAX ( DIM_DATE[full_date] ) ) )
+		formatString: #,0
+		displayFolder: 01 - Overview
+		lineageTag: a41a4b8c-858f-5e71-a772-f5b3983db206
+
+	/// Blank outside the top 10, so the bar chart keeps 10 bars without a visual filter.
+	measure 'Total Loans (Top 10 Users)' =
+			IF (
+			    RANKX ( ALLSELECTED ( DIM_USER[full_name] ), [Total Loans],, DESC, DENSE ) <= 10,
+			    [Total Loans]
+			)
+		formatString: #,0
+		displayFolder: 01 - Overview
+		lineageTag: 6d50344d-6efb-5a90-841e-90b8b8f7e8c7
+
+	measure 'Loans (Exam Period)' = CALCULATE ( [Total Loans], DIM_DATE[is_exam_period] = TRUE () )
+		formatString: #,0
+		displayFolder: 02 - Time & Exams
+		lineageTag: 53ea8678-9cbc-58c3-86f4-84bd53b21cfe
+
+	measure 'Loans (Off-Exam)' = CALCULATE ( [Total Loans], DIM_DATE[is_exam_period] = FALSE () )
+		formatString: #,0
+		displayFolder: 02 - Time & Exams
+		lineageTag: 8bdf5c1d-61c4-50d5-b6f9-ae155828b0cf
+
+	measure 'Exam-Period Loans %' = DIVIDE ( [Loans (Exam Period)], [Total Loans] )
+		formatString: 0.0%
+		displayFolder: 02 - Time & Exams
+		lineageTag: 2b31bbb4-dee5-5566-abd2-36e1743ad411
+
+	measure '_Exam Days' = CALCULATE ( COUNTROWS ( DIM_DATE ), DIM_DATE[is_exam_period] = TRUE () )
+		formatString: #,0
+		displayFolder: 02 - Time & Exams
+		lineageTag: dd63a38c-b28e-5974-8732-ee90d66cee3b
+
+	measure '_Off-Exam Days' = CALCULATE ( COUNTROWS ( DIM_DATE ), DIM_DATE[is_exam_period] = FALSE () )
+		formatString: #,0
+		displayFolder: 02 - Time & Exams
+		lineageTag: e70a98ac-b5d3-5582-aa1a-ce313149d55f
+
+	measure 'Daily Loans (Exam Period)' = DIVIDE ( [Loans (Exam Period)], [_Exam Days] )
+		formatString: #,0.0
+		displayFolder: 02 - Time & Exams
+		lineageTag: 1801eabd-bbfe-536b-a782-a25763ff22ae
+
+	measure 'Daily Loans (Off-Exam)' = DIVIDE ( [Loans (Off-Exam)], [_Off-Exam Days] )
+		formatString: #,0.0
+		displayFolder: 02 - Time & Exams
+		lineageTag: fa3696ce-0af3-57af-b877-4ccbe42acedb
+
+	measure 'Exam Overload Index' = DIVIDE ( [Daily Loans (Exam Period)], [Daily Loans (Off-Exam)] )
+		formatString: #,0.00
+		displayFolder: 02 - Time & Exams
+		lineageTag: de179969-d1a4-5f4a-91ac-af81f2abba76
+
+	measure 'Weekend Loans %' = DIVIDE ( CALCULATE ( [Total Loans], DIM_DATE[is_weekend] = TRUE () ), [Total Loans] )
+		formatString: 0.0%
+		displayFolder: 02 - Time & Exams
+		lineageTag: a575e075-2b20-5de1-bf23-984e368ae7b1
+
+	measure 'Avg Branch Daily Load' =
+			VAR _TotalDays = CALCULATE ( COUNTROWS ( DIM_DATE ), DIM_DATE[full_date] <= MAX ( DIM_DATE[full_date] ) )
+			RETURN DIVIDE ( [Total Loans], _TotalDays )
+		formatString: #,0.0
+		displayFolder: 03 - Network
+		lineageTag: 7935fa4c-06aa-5f2b-8763-7fcc4cbd27b8
+
+	measure 'Branch Loan Share %' = DIVIDE ( [Total Loans], CALCULATE ( [Total Loans], ALL ( DIM_BRANCH ) ) )
+		formatString: 0.0%
+		displayFolder: 03 - Network
+		lineageTag: deb0a2f7-8eda-5a78-a91e-cfa6d0ea6a53
+
+	measure 'Loans per User' = DIVIDE ( [Total Loans], [Active Users] )
+		formatString: #,0.0
+		displayFolder: 04 - Users
+		lineageTag: f1c6ee2f-58da-5ee6-85dc-32acb335f8dd
+
+	measure 'Overdue Loans' = CALCULATE ( COUNTROWS ( FACT_LOAN ), FACT_LOAN[days_overdue] > 0 )
+		formatString: #,0
+		displayFolder: 04 - Users
+		lineageTag: a5770cb9-0379-598b-86b3-277cff6f24ac
+
+	/// Overdue loans / closed loans: open loans always have 0 overdue days.
+	measure 'Overdue Rate %' = DIVIDE ( [Overdue Loans], [Closed Loans] )
+		formatString: 0.0%
+		displayFolder: 04 - Users
+		lineageTag: 3b55bb8c-b1f5-5250-b6ee-34e6d2ad54a2
+
+	measure 'Avg Overdue Days (overdue only)' = AVERAGEX ( FILTER ( FACT_LOAN, FACT_LOAN[days_overdue] > 0 ), FACT_LOAN[days_overdue] )
+		formatString: #,0.0
+		displayFolder: 04 - Users
+		lineageTag: 467be900-e2c2-5f8e-a507-369e747769c1
+
+	measure 'Total Penalties' = SUM ( FACT_LOAN[penalty_amount] )
+		formatString: #,0.00 €
+		displayFolder: 04 - Users
+		lineageTag: 2c1544c0-ce75-5f8a-bb08-1343dfc55136
+
+	measure 'Avg Penalty per User' = DIVIDE ( [Total Penalties], [Active Users] )
+		formatString: #,0.00 €
+		displayFolder: 04 - Users
+		lineageTag: 2697db7a-eaa9-58c6-bc33-1531fc52b991
+
+	measure 'Avg Loan Duration (days)' = AVERAGE ( FACT_LOAN[loan_duration_days] )
+		formatString: #,0.0
+		displayFolder: 04 - Users
+		lineageTag: ff158192-7ffb-5d68-9327-d79a2c221f01
+
+	measure 'Book Rank' = IF ( HASONEVALUE ( DIM_BOOK[book_id] ), RANKX ( ALL ( DIM_BOOK[book_id] ), [Total Loans],, DESC, DENSE ) )
+		formatString: 0
+		displayFolder: 05 - Catalogue
+		lineageTag: 5c4d5aa0-43dd-5402-b55c-2266c065a9c7
+
+	measure 'Cumulative Loans % (Pareto)' =
+			VAR CurLoans = [Total Loans]
+			VAR Books = ADDCOLUMNS ( ALLSELECTED ( DIM_BOOK[title] ), "@loans", [Total Loans] )
+			VAR Grand = SUMX ( Books, [@loans] )
+			VAR CumLoans = SUMX ( FILTER ( Books, [@loans] >= CurLoans ), [@loans] )
+			RETURN IF ( NOT ISBLANK ( CurLoans ), DIVIDE ( CumLoans, Grand ) )
+		formatString: 0.0%
+		displayFolder: 05 - Catalogue
+		lineageTag: a1fd97d0-0866-5e69-a71a-b057f7d67557
+
+	measure 'Top 20% Books Loan Share %' =
+			VAR N = COUNTROWS ( ALL ( DIM_BOOK[book_id] ) )
+			VAR NbTop = ROUNDUP ( N * 0.2, 0 )
+			VAR T = ADDCOLUMNS ( ALL ( DIM_BOOK[book_id] ), "@l", [Total Loans] )
+			VAR TopBooks = TOPN ( NbTop, T, [@l], DESC )
+			RETURN DIVIDE ( SUMX ( TopBooks, [@l] ), SUMX ( T, [@l] ) )
+		formatString: 0.0%
+		displayFolder: 05 - Catalogue
+		lineageTag: dd801bd7-328c-5645-ac5a-3a60309add15
+
+	column loan_id
+		dataType: string
+		isHidden
+		lineageTag: e9161628-e1c6-5036-9006-a1d42a5b498a
+		summarizeBy: none
+		sourceColumn: loan_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_id
+		dataType: int64
+		isHidden
+		lineageTag: fa622cd8-1b82-5f91-9957-f71d8c4ede52
+		summarizeBy: none
+		sourceColumn: date_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 0c848c87-4976-5205-8d6a-d8a51ce3e35f
+		summarizeBy: none
+		sourceColumn: event_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column user_id
+		dataType: int64
+		isHidden
+		lineageTag: 04c2aa79-4582-5353-b5f0-5b4c7f79753d
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column book_id
+		dataType: int64
+		isHidden
+		lineageTag: 395fae64-8025-5786-8bad-4b0c2847200f
+		summarizeBy: none
+		sourceColumn: book_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column branch_id
+		dataType: int64
+		isHidden
+		lineageTag: 99a9d440-4cb7-56e0-afbe-a314723ce7df
+		summarizeBy: none
+		sourceColumn: branch_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_id
+		dataType: int64
+		isHidden
+		lineageTag: 43e0803b-c0ae-5278-a2c7-080ade579075
+		summarizeBy: none
+		sourceColumn: category_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column loan_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: b79d0d18-8450-53c0-9e87-bc326f8f114f
+		summarizeBy: none
+		sourceColumn: loan_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column due_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: e94ca61c-3f66-5949-90e9-45a5709f436d
+		summarizeBy: none
+		sourceColumn: due_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column return_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: e866bdf1-f039-5445-b7ac-412985030f90
+		summarizeBy: none
+		sourceColumn: return_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column loan_duration_days
+		dataType: int64
+		isHidden
+		lineageTag: 57f91d20-51ac-5f7c-b28d-aa7007da2663
+		summarizeBy: sum
+		sourceColumn: loan_duration_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column days_overdue
+		dataType: int64
+		isHidden
+		lineageTag: 3199387b-10f1-5772-b34d-112c51924a69
+		summarizeBy: sum
+		sourceColumn: days_overdue
+
+		annotation SummarizationSetBy = Automatic
+
+	column penalty_amount
+		dataType: double
+		isHidden
+		lineageTag: d99c2f3b-8e87-584c-91d9-2f8c8ff1521e
+		summarizeBy: sum
+		sourceColumn: penalty_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: int64
+		isHidden
+		lineageTag: 7446890a-3705-53e4-a684-0498a8b62e9e
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FACT_LOAN = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "FACT_LOAN.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"loan_id", type text}, {"date_id", Int64.Type}, {"event_date", type date}, {"user_id", Int64.Type}, {"book_id", Int64.Type}, {"branch_id", Int64.Type}, {"category_id", Int64.Type}, {"loan_date", type date}, {"due_date", type date}, {"return_date", type date}, {"loan_duration_days", Int64.Type}, {"days_overdue", Int64.Type}, {"penalty_amount", type number}, {"quantity", Int64.Type}}, "en-US")
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table

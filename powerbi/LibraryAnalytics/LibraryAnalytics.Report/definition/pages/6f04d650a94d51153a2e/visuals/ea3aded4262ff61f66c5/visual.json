@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "ea3aded4262ff61f66c5",
+  "position": {
+    "x": 331.0,
+    "y": 88,
+    "z": 5000,
+    "width": 303.0,
+    "height": 96,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_INVENTORY_SNAPSHOT"
+                    }
+                  },
+                  "Property": "Critical Pairs (Last Month)"
+                }
+              },
+              "queryRef": "FACT_INVENTORY_SNAPSHOT.Critical Pairs (Last Month)",
+              "nativeQueryRef": "Critical Pairs (Last Month)"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Critical Pairs (Last Month)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -7,14 +7,14 @@ on:
 
 jobs:
   checks:
-    name: Data reproducible and README figures
+    name: Data reproducible, README figures, report up to date
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - run: pip install -r requirements.txt pytest
+      - run: pip install -r requirements.txt -r powerbi/requirements.txt pytest
       - name: Generator rebuilds data/ byte for byte
         run: |
           python generate_data.py --out /tmp/regen

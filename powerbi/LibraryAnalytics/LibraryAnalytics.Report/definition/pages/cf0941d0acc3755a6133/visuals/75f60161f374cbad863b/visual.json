@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "75f60161f374cbad863b",
+  "position": {
+    "x": 961.0,
+    "y": 88,
+    "z": 8000,
+    "width": 303.0,
+    "height": 96,
+    "tabOrder": 8000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_RESERVATION"
+                    }
+                  },
+                  "Property": "Avg Reservation Wait (days)"
+                }
+              },
+              "queryRef": "FACT_RESERVATION.Avg Reservation Wait (days)",
+              "nativeQueryRef": "Avg Reservation Wait (days)"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Avg Reservation Wait (days)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

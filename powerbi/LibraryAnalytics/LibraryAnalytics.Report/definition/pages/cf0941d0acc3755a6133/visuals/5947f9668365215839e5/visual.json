@@ -1,0 +1,120 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "5947f9668365215839e5",
+  "position": {
+    "x": 583.6,
+    "y": 456.0,
+    "z": 11000,
+    "width": 680.4,
+    "height": 248.0,
+    "tabOrder": 11000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_BOOK"
+                    }
+                  },
+                  "Property": "title"
+                }
+              },
+              "queryRef": "DIM_BOOK.title",
+              "nativeQueryRef": "title"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Total Loans"
+                }
+              },
+              "queryRef": "FACT_LOAN.Total Loans",
+              "nativeQueryRef": "Total Loans"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_RESERVATION"
+                    }
+                  },
+                  "Property": "Avg Reservation Wait (days)"
+                }
+              },
+              "queryRef": "FACT_RESERVATION.Avg Reservation Wait (days)",
+              "nativeQueryRef": "Avg Reservation Wait (days)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_RESERVATION"
+                    }
+                  },
+                  "Property": "Reservation Cancel Rate %"
+                }
+              },
+              "queryRef": "FACT_RESERVATION.Reservation Cancel Rate %",
+              "nativeQueryRef": "Reservation Cancel Rate %"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "FACT_LOAN"
+                  }
+                },
+                "Property": "Total Loans"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Book Demand & Reservations'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

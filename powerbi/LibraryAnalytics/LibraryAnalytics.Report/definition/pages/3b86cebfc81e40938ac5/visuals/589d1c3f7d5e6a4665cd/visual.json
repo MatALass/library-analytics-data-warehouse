@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "589d1c3f7d5e6a4665cd",
+  "position": {
+    "x": 1024.0,
+    "y": 88,
+    "z": 8000,
+    "width": 240.0,
+    "height": 96,
+    "tabOrder": 8000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Weekend Loans %"
+                }
+              },
+              "queryRef": "FACT_LOAN.Weekend Loans %",
+              "nativeQueryRef": "Weekend Loans %"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Weekend Loans %'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "adb870b1a440911bf626",
+  "position": {
+    "x": 331.0,
+    "y": 88,
+    "z": 5000,
+    "width": 303.0,
+    "height": 96,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Avg Branch Daily Load"
+                }
+              },
+              "queryRef": "FACT_LOAN.Avg Branch Daily Load",
+              "nativeQueryRef": "Avg Branch Daily Load"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Avg Branch Daily Load'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
