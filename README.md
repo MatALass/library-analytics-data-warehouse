@@ -44,8 +44,13 @@ library-analytics-data-warehouse/
 │   ├── DIM_DATE.csv  DIM_BOOK.csv  DIM_BRANCH.csv  DIM_CATEGORY.csv  DIM_USER.csv
 │   └── FACT_LOAN.csv  FACT_RESERVATION.csv  FACT_INVENTORY_SNAPSHOT.csv
 ├── generate_data.py              reproducible generator (writes the English CSVs)
-└── source_dimensions/            hand-authored dimension sources (input to the generator)
-    └── DIM_DATE.csv  DIM_BOOK.csv  DIM_BRANCH.csv  DIM_CATEGORY.csv  DIM_USER.csv
+├── source_dimensions/            hand-authored dimension sources (input to the generator)
+│   └── DIM_DATE.csv  DIM_BOOK.csv  DIM_BRANCH.csv  DIM_CATEGORY.csv  DIM_USER.csv
+├── docs/
+│   ├── model.md                  all 57 DAX measures and 14 relationships, readable on GitHub
+│   └── model_review.md           review of the model and fixes to apply in Desktop
+├── tools/export_model.py         regenerates docs/model.md from the .pbix
+└── tests/test_kpis.py            every README figure recomputed from the CSVs
 ```
 
 The `.pbix` opens **standalone** — the data is imported (embedded), so no CSV is needed
@@ -188,8 +193,8 @@ Each relationship: **one-to-many (1:\*)**, cross-filter **Single** (dimension fi
 
 Trends are injected on purpose and **correlated** (measured on seed 42):
 
-1. **Book Pareto (80/20).** The top 20 % of books capture **~44 %** of loans; the long
-   tail of `low` books stays cold. → targeted-acquisition story.
+1. **Book Pareto (80/20).** The top 20 % of books (15 of 72) capture **46.4 %** of loans;
+   the long tail of `low` books stays cold. → targeted-acquisition story.
 2. **Exam × category interaction.** Loans spike during exams, **but not for everyone**:
    Law ×2.8, Data Science & AI ×2.9, Health ×2.7; Literature ×1.8, Humanities ×1.6.
    An *interaction effect*, more telling than a flat average.
@@ -198,8 +203,9 @@ Trends are injected on purpose and **correlated** (measured on seed 42):
 4. **Annual growth + an emerging hub.** Network grows **22.8 → 24.4 → 28.6 loans/day**
    (2024→2026). **Brussels** rises fastest (share **17.9 % → 21.7 %**). September peak,
    summer trough.
-5. **User segmentation.** Overdue rate by type: **Student 24.8 %**, Researcher 15.3 %,
-   Faculty 14.5 %. Researchers/faculty borrow more and longer (28 d vs 14 d).
+5. **User segmentation.** Overdue rate by type (overdue / closed loans, as in the report):
+   **Student 26.1 %**, Researcher 16.7 %, Faculty 15.8 %. Researchers/faculty borrow
+   longer (28 d vs 16 d).
 6. **Stock reallocation — the differentiator.** Tense branches (Paris, Brussels,
    Marseille) are **under-allocated** vs demand; calm ones (Lille, Liège) hold **idle
    stock**. Headline (last month): **124 critical pairs**, **353 units of unmet demand**,
@@ -220,6 +226,19 @@ Trends are injected on purpose and **correlated** (measured on seed 42):
 | 1–2 | Raphaël | Q1 volume/growth · Q2 emerging hub · Q3 seasonality · Q4 exams × category |
 | 3–4 | Samuel | Q5 branch load · Q6 overdue by profile · Q7 cost of overdue |
 | 5–6 | Mathieu | Q8 books to prioritise · Q9 backlogged demand · Q10 stock tension · Q11/Q12 reallocation |
+
+---
+
+## ✅ Tests
+
+```powershell
+pip install -r requirements-dev.txt
+pytest -q                          # README figures recomputed from the CSVs
+python tools/export_model.py       # refresh docs/model.md after editing the .pbix
+```
+
+The CI also regenerates the data with `generate_data.py` and checks that it matches
+`data/` byte for byte.
 
 ---
 
