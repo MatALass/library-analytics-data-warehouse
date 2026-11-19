@@ -1,0 +1,120 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "480a0e5083de34c80027",
+  "position": {
+    "x": 770.8,
+    "y": 196,
+    "z": 12000,
+    "width": 493.2,
+    "height": 508,
+    "tabOrder": 12000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_USER"
+                    }
+                  },
+                  "Property": "full_name"
+                }
+              },
+              "queryRef": "DIM_USER.full_name",
+              "nativeQueryRef": "full_name"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Total Loans"
+                }
+              },
+              "queryRef": "FACT_LOAN.Total Loans",
+              "nativeQueryRef": "Total Loans"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Avg Overdue Days (overdue only)"
+                }
+              },
+              "queryRef": "FACT_LOAN.Avg Overdue Days (overdue only)",
+              "nativeQueryRef": "Avg Overdue Days (overdue only)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Total Penalties"
+                }
+              },
+              "queryRef": "FACT_LOAN.Total Penalties",
+              "nativeQueryRef": "Total Penalties"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "FACT_LOAN"
+                  }
+                },
+                "Property": "Total Loans"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Top Users by Loans & Penalties'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

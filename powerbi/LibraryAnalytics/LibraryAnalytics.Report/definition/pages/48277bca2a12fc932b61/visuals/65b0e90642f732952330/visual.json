@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "65b0e90642f732952330",
+  "position": {
+    "x": 520.0,
+    "y": 88,
+    "z": 7000,
+    "width": 240.0,
+    "height": 96,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Avg Overdue Days (overdue only)"
+                }
+              },
+              "queryRef": "FACT_LOAN.Avg Overdue Days (overdue only)",
+              "nativeQueryRef": "Avg Overdue Days (overdue only)"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Avg Overdue Days (overdue only)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

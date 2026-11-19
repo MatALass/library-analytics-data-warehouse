@@ -1,0 +1,96 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "a6fa195ddc87271ecaaf",
+  "position": {
+    "x": 16,
+    "y": 196,
+    "z": 8000,
+    "width": 318.48,
+    "height": 508,
+    "tabOrder": 8000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_BRANCH"
+                    }
+                  },
+                  "Property": "branch_name"
+                }
+              },
+              "queryRef": "DIM_BRANCH.branch_name",
+              "nativeQueryRef": "branch_name"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_INVENTORY_SNAPSHOT"
+                    }
+                  },
+                  "Property": "Avg Utilization (Last Month)"
+                }
+              },
+              "queryRef": "FACT_INVENTORY_SNAPSHOT.Avg Utilization (Last Month)",
+              "nativeQueryRef": "Avg Utilization (Last Month)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "FACT_INVENTORY_SNAPSHOT"
+                  }
+                },
+                "Property": "Avg Utilization (Last Month)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Branch Utilization (Last Month)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

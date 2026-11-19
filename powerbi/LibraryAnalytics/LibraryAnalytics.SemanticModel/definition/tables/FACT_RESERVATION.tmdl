@@ -1,0 +1,145 @@
+table FACT_RESERVATION
+	lineageTag: d1273b24-1694-5006-aed2-a3c6f6c6364b
+
+	measure 'Total Reservations' = COUNTROWS ( FACT_RESERVATION )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: aa313241-05fc-5313-bc3c-fefb766c4056
+
+	measure 'Fulfilled Reservations' = CALCULATE ( [Total Reservations], FACT_RESERVATION[reservation_status] = "fulfilled" )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: e26ed0a8-fab7-591b-a3f4-4a89345734ac
+
+	measure 'Pending Reservations' = CALCULATE ( [Total Reservations], FACT_RESERVATION[reservation_status] = "pending" )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: e4b8d28f-dbdd-52ad-9255-1fd76128b001
+
+	measure 'Cancelled Reservations' = CALCULATE ( [Total Reservations], FACT_RESERVATION[reservation_status] = "cancelled" )
+		formatString: #,0
+		displayFolder: 00 - Common
+		lineageTag: 37bac29c-bd13-5b76-a478-63ea04316812
+
+	measure 'Reservation Fulfillment Rate %' = DIVIDE ( [Fulfilled Reservations], [Total Reservations] )
+		formatString: 0.0%
+		displayFolder: 05 - Catalogue
+		lineageTag: 3e682ec1-0ab4-59c3-aaf5-b95a74bade34
+
+	measure 'Reservation Cancel Rate %' = DIVIDE ( [Cancelled Reservations], [Total Reservations] )
+		formatString: 0.0%
+		displayFolder: 05 - Catalogue
+		lineageTag: 31bb1126-6930-500c-8b39-6f9460520dc9
+
+	measure 'Avg Reservation Wait (days)' = AVERAGE ( FACT_RESERVATION[wait_days] )
+		formatString: #,0.0
+		displayFolder: 05 - Catalogue
+		lineageTag: c9424d66-2f75-541a-8059-b78d13349814
+
+	measure 'Demand Pressure (Resv per Loan)' = DIVIDE ( [Total Reservations], [Total Loans] )
+		formatString: #,0.00
+		displayFolder: 05 - Catalogue
+		lineageTag: 9bec7faf-4af9-5ae4-b03f-879f2622f11b
+
+	column reservation_id
+		dataType: string
+		isHidden
+		lineageTag: c009c712-fe5f-56d1-8f54-83feb62be5d8
+		summarizeBy: none
+		sourceColumn: reservation_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_id
+		dataType: int64
+		isHidden
+		lineageTag: 14e80c42-13c8-515a-9c0a-62ab251949c3
+		summarizeBy: none
+		sourceColumn: date_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: fe469f72-02c4-5035-88ee-f489f13a1031
+		summarizeBy: none
+		sourceColumn: event_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column user_id
+		dataType: int64
+		isHidden
+		lineageTag: bd50ff17-e21f-5e70-ba61-88b71bc75b0e
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column book_id
+		dataType: int64
+		isHidden
+		lineageTag: 108b73e6-43cf-541e-b59d-2d5bb1d58a9a
+		summarizeBy: none
+		sourceColumn: book_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column branch_id
+		dataType: int64
+		isHidden
+		lineageTag: e8366d21-6e54-5381-8a56-f42675757af8
+		summarizeBy: none
+		sourceColumn: branch_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_id
+		dataType: int64
+		isHidden
+		lineageTag: e9f917fe-cc2b-5083-8c5d-8a206aa44120
+		summarizeBy: none
+		sourceColumn: category_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column reservation_status
+		dataType: string
+		lineageTag: f55014cf-e84a-5057-a879-7cafbacff64c
+		summarizeBy: none
+		sourceColumn: reservation_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column wait_days
+		dataType: int64
+		isHidden
+		lineageTag: a253c41a-5e36-561f-95e2-cda8aaf62ff6
+		summarizeBy: sum
+		sourceColumn: wait_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: int64
+		isHidden
+		lineageTag: 66f7ec15-6b9a-5a0e-a206-15ab322a0f38
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FACT_RESERVATION = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "FACT_RESERVATION.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"reservation_id", type text}, {"date_id", Int64.Type}, {"event_date", type date}, {"user_id", Int64.Type}, {"book_id", Int64.Type}, {"branch_id", Int64.Type}, {"category_id", Int64.Type}, {"reservation_status", type text}, {"wait_days", Int64.Type}, {"quantity", Int64.Type}}, "en-US")
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table

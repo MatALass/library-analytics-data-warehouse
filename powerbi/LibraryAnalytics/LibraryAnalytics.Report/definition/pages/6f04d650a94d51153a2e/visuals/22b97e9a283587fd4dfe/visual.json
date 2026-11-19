@@ -1,0 +1,134 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "22b97e9a283587fd4dfe",
+  "position": {
+    "x": 346.48,
+    "y": 481.4,
+    "z": 10000,
+    "width": 917.52,
+    "height": 222.6,
+    "tabOrder": 10000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_BOOK"
+                    }
+                  },
+                  "Property": "title"
+                }
+              },
+              "queryRef": "DIM_BOOK.title",
+              "nativeQueryRef": "title"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_BRANCH"
+                    }
+                  },
+                  "Property": "branch_name"
+                }
+              },
+              "queryRef": "DIM_BRANCH.branch_name",
+              "nativeQueryRef": "branch_name"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_INVENTORY_SNAPSHOT"
+                    }
+                  },
+                  "Property": "Current Reallocation Priority"
+                }
+              },
+              "queryRef": "FACT_INVENTORY_SNAPSHOT.Current Reallocation Priority",
+              "nativeQueryRef": "Current Reallocation Priority"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_INVENTORY_SNAPSHOT"
+                    }
+                  },
+                  "Property": "Available Copies (Last Month)"
+                }
+              },
+              "queryRef": "FACT_INVENTORY_SNAPSHOT.Available Copies (Last Month)",
+              "nativeQueryRef": "Available Copies (Last Month)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_INVENTORY_SNAPSHOT"
+                    }
+                  },
+                  "Property": "Unsatisfied Demand (Last Month)"
+                }
+              },
+              "queryRef": "FACT_INVENTORY_SNAPSHOT.Unsatisfied Demand (Last Month)",
+              "nativeQueryRef": "Unsatisfied Demand (Last Month)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "FACT_INVENTORY_SNAPSHOT"
+                  }
+                },
+                "Property": "Unsatisfied Demand (Last Month)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Reallocation Plan: Critical vs Idle Stock'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

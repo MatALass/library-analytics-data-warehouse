@@ -1,0 +1,267 @@
+table FACT_INVENTORY_SNAPSHOT
+	lineageTag: 3e35687f-841c-5069-914b-0818b058bf30
+
+	/// date_id of the latest monthly snapshot in the selected period.
+	measure '_Last Snapshot Date' = CALCULATE ( MAX ( FACT_INVENTORY_SNAPSHOT[date_id] ), ALL ( FACT_INVENTORY_SNAPSHOT ), ALLSELECTED ( DIM_DATE ) )
+		formatString: 0
+		displayFolder: 00 - Common
+		lineageTag: 1e82c46e-1893-550e-af21-a3da6136ce55
+
+	measure 'Total Copies (Last Month)' =
+			VAR d = [_Last Snapshot Date]
+			RETURN CALCULATE ( SUM ( FACT_INVENTORY_SNAPSHOT[total_copies] ), FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d ) )
+		formatString: #,0
+		displayFolder: 06 - Stock
+		lineageTag: 1be633a2-2468-52cb-9bbb-ec1b0664af1a
+
+	measure 'Available Copies (Last Month)' =
+			VAR d = [_Last Snapshot Date]
+			RETURN CALCULATE ( SUM ( FACT_INVENTORY_SNAPSHOT[available_copies] ), FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d ) )
+		formatString: #,0
+		displayFolder: 06 - Stock
+		lineageTag: d9108758-4a99-5098-9e53-f33d638c21c8
+
+	/// Weighted by copies: a pair with 30 copies weighs more than a pair with 1.
+	measure 'Avg Utilization (Last Month)' =
+			VAR d = [_Last Snapshot Date]
+			RETURN
+			    CALCULATE (
+			        DIVIDE ( SUM ( FACT_INVENTORY_SNAPSHOT[active_loans] ), SUM ( FACT_INVENTORY_SNAPSHOT[total_copies] ) ),
+			        FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d )
+			    )
+		formatString: 0.0%
+		displayFolder: 06 - Stock
+		lineageTag: 41c5c264-8c3c-5740-a122-c228045fdbdb
+
+	measure 'Out-of-Stock Rate % (Last Month)' =
+			VAR d = [_Last Snapshot Date]
+			RETURN
+			    CALCULATE (
+			        DIVIDE (
+			            CALCULATE ( COUNTROWS ( FACT_INVENTORY_SNAPSHOT ), FACT_INVENTORY_SNAPSHOT[out_of_stock] = TRUE () ),
+			            COUNTROWS ( FACT_INVENTORY_SNAPSHOT )
+			        ),
+			        FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d )
+			    )
+		formatString: 0.0%
+		displayFolder: 06 - Stock
+		lineageTag: 0abdeaa9-3f7a-5728-b90e-5076e21fb48b
+
+	/// Weighted by copies.
+	measure 'Avg Utilization (Month)' = DIVIDE ( SUM ( FACT_INVENTORY_SNAPSHOT[active_loans] ), SUM ( FACT_INVENTORY_SNAPSHOT[total_copies] ) )
+		formatString: 0.0%
+		displayFolder: 06 - Stock
+		lineageTag: 4c281834-d79d-58f2-a48d-4b66f13924bd
+
+	measure 'Unsatisfied Reservations (Month)' = SUM ( FACT_INVENTORY_SNAPSHOT[unsatisfied_reservations] )
+		formatString: #,0
+		displayFolder: 06 - Stock
+		lineageTag: f7410c5f-57a7-5579-ac2c-71c2e13b59c4
+
+	measure 'Critical Pairs (Last Month)' =
+			VAR d = [_Last Snapshot Date]
+			RETURN CALCULATE ( COUNTROWS ( FACT_INVENTORY_SNAPSHOT ), FACT_INVENTORY_SNAPSHOT[reallocation_priority] = "Critical", FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d ) )
+		formatString: #,0
+		displayFolder: 06 - Stock
+		lineageTag: 611c66e7-47e6-5c5d-971e-f0682413e5a9
+
+	measure 'Unsatisfied Demand (Last Month)' =
+			VAR d = [_Last Snapshot Date]
+			RETURN CALCULATE ( SUM ( FACT_INVENTORY_SNAPSHOT[unsatisfied_reservations] ), FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d ) )
+		formatString: #,0
+		displayFolder: 06 - Stock
+		lineageTag: 7c424bf9-b5d2-5763-95f0-0836150694f9
+
+	measure 'Idle Copies (Last Month)' =
+			VAR d = [_Last Snapshot Date]
+			RETURN CALCULATE ( SUM ( FACT_INVENTORY_SNAPSHOT[available_copies] ), FACT_INVENTORY_SNAPSHOT[reallocation_priority] = "Low", FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d ) )
+		formatString: #,0
+		displayFolder: 06 - Stock
+		lineageTag: 7c16c404-d368-5f0b-8ab1-c716db8f6b71
+
+	/// Idle copies that can move while keeping one copy on site.
+	measure 'Movable Idle Copies (Last Month)' =
+			VAR d = [_Last Snapshot Date]
+			RETURN
+			    CALCULATE (
+			        SUMX ( FACT_INVENTORY_SNAPSHOT, MAX ( FACT_INVENTORY_SNAPSHOT[available_copies] - 1, 0 ) ),
+			        FACT_INVENTORY_SNAPSHOT[reallocation_priority] = "Low",
+			        FACT_INVENTORY_SNAPSHOT[available_copies] >= 2,
+			        FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d )
+			    )
+		formatString: #,0
+		displayFolder: 06 - Stock
+		lineageTag: f85eb300-9833-5233-bbb3-941650675f48
+
+	/// Share of last month's unmet demand coverable by moving idle stock, with no new purchase.
+	measure 'Reallocation Coverage Rate %' = DIVIDE ( [Movable Idle Copies (Last Month)], [Unsatisfied Demand (Last Month)] )
+		formatString: 0.0%
+		displayFolder: 06 - Stock
+		lineageTag: 9f2a8472-27f5-50c0-86e8-08e9b2e86314
+
+	measure 'Current Reallocation Priority' =
+			VAR d = [_Last Snapshot Date]
+			RETURN
+			    CALCULATE (
+			        SELECTEDVALUE ( FACT_INVENTORY_SNAPSHOT[reallocation_priority] ),
+			        FILTER ( ALL ( DIM_DATE ), DIM_DATE[date_id] = d ),
+			        ALL ( FACT_INVENTORY_SNAPSHOT[reallocation_priority] )
+			    )
+		displayFolder: 06 - Stock
+		lineageTag: a122f8f9-ae94-5c9f-b9aa-43ed40cc4816
+
+	column snapshot_id
+		dataType: string
+		isHidden
+		lineageTag: 34ac3d97-d152-5f46-8d99-46cc10074ed1
+		summarizeBy: none
+		sourceColumn: snapshot_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_id
+		dataType: int64
+		isHidden
+		lineageTag: aba6f384-49dc-56ee-aef4-4ce65d93ffc2
+		summarizeBy: none
+		sourceColumn: date_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column snapshot_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 6f58536c-e8e4-5888-bf13-8368a8dfac92
+		summarizeBy: none
+		sourceColumn: snapshot_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column book_id
+		dataType: int64
+		isHidden
+		lineageTag: 355ebd26-8e5c-56c0-8cad-30c049c9ae35
+		summarizeBy: none
+		sourceColumn: book_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column branch_id
+		dataType: int64
+		isHidden
+		lineageTag: ae171abf-f0e4-5203-827e-f338fac49630
+		summarizeBy: none
+		sourceColumn: branch_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_id
+		dataType: int64
+		isHidden
+		lineageTag: bef040ff-d451-5ab0-89fe-6037f91080bc
+		summarizeBy: none
+		sourceColumn: category_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_copies
+		dataType: int64
+		isHidden
+		lineageTag: 7313c431-8464-525c-a2ea-5b3da5178a9d
+		summarizeBy: sum
+		sourceColumn: total_copies
+
+		annotation SummarizationSetBy = Automatic
+
+	column available_copies
+		dataType: int64
+		isHidden
+		lineageTag: 773db550-e8b3-5365-b4a1-9c0d7e3e0032
+		summarizeBy: sum
+		sourceColumn: available_copies
+
+		annotation SummarizationSetBy = Automatic
+
+	column active_loans
+		dataType: int64
+		isHidden
+		lineageTag: bbb79c68-aa2a-51f6-b654-318078410131
+		summarizeBy: sum
+		sourceColumn: active_loans
+
+		annotation SummarizationSetBy = Automatic
+
+	column utilization_rate
+		dataType: double
+		isHidden
+		lineageTag: 1f1783d1-3077-53dc-9574-6169e21d17a4
+		summarizeBy: sum
+		sourceColumn: utilization_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column availability_rate
+		dataType: double
+		isHidden
+		lineageTag: 3409f472-bed9-5dc4-b1d0-107bb9ff225a
+		summarizeBy: sum
+		sourceColumn: availability_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column out_of_stock
+		dataType: boolean
+		lineageTag: def88f2c-b8e2-5370-895d-25e43da86c4c
+		summarizeBy: none
+		sourceColumn: out_of_stock
+
+		annotation SummarizationSetBy = Automatic
+
+	column loan_count_total
+		dataType: int64
+		isHidden
+		lineageTag: 61107f48-81a0-5ce5-b371-978c72479e51
+		summarizeBy: sum
+		sourceColumn: loan_count_total
+
+		annotation SummarizationSetBy = Automatic
+
+	column loan_count_120d
+		dataType: int64
+		isHidden
+		lineageTag: 7e08fa83-7f94-5056-90e2-deb7e8182829
+		summarizeBy: sum
+		sourceColumn: loan_count_120d
+
+		annotation SummarizationSetBy = Automatic
+
+	column unsatisfied_reservations
+		dataType: int64
+		isHidden
+		lineageTag: cea65f73-03c8-5757-94dd-3f6595f90fe7
+		summarizeBy: sum
+		sourceColumn: unsatisfied_reservations
+
+		annotation SummarizationSetBy = Automatic
+
+	column reallocation_priority
+		dataType: string
+		lineageTag: 6639464f-0753-5008-a034-d7db39473771
+		summarizeBy: none
+		sourceColumn: reallocation_priority
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FACT_INVENTORY_SNAPSHOT = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "FACT_INVENTORY_SNAPSHOT.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"snapshot_id", type text}, {"date_id", Int64.Type}, {"snapshot_date", type date}, {"book_id", Int64.Type}, {"branch_id", Int64.Type}, {"category_id", Int64.Type}, {"total_copies", Int64.Type}, {"available_copies", Int64.Type}, {"active_loans", Int64.Type}, {"utilization_rate", type number}, {"availability_rate", type number}, {"out_of_stock", type logical}, {"loan_count_total", Int64.Type}, {"loan_count_120d", Int64.Type}, {"unsatisfied_reservations", Int64.Type}, {"reallocation_priority", type text}}, "en-US")
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table

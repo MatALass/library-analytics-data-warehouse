@@ -1,0 +1,96 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "54a9fa35f0672d93a773",
+  "position": {
+    "x": 521.2,
+    "y": 196,
+    "z": 9000,
+    "width": 742.8,
+    "height": 227.68,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_BRANCH"
+                    }
+                  },
+                  "Property": "city"
+                }
+              },
+              "queryRef": "DIM_BRANCH.city",
+              "nativeQueryRef": "city"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Branch Loan Share %"
+                }
+              },
+              "queryRef": "FACT_LOAN.Branch Loan Share %",
+              "nativeQueryRef": "Branch Loan Share %"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "FACT_LOAN"
+                  }
+                },
+                "Property": "Branch Loan Share %"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Branch Loan Share by City'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

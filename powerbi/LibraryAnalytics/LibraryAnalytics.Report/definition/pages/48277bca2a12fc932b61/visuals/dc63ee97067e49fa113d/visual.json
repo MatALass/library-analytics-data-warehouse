@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "dc63ee97067e49fa113d",
+  "position": {
+    "x": 1024.0,
+    "y": 88,
+    "z": 9000,
+    "width": 240.0,
+    "height": 96,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Avg Loan Duration (days)"
+                }
+              },
+              "queryRef": "FACT_LOAN.Avg Loan Duration (days)",
+              "nativeQueryRef": "Avg Loan Duration (days)"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Avg Loan Duration (days)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

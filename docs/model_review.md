@@ -1,6 +1,6 @@
 # Model review
 
-Review of `library_analytics.pbix` (November 2026). The model was read with `tools/export_model.py` and every figure of the README was recomputed from the CSVs in `tests/test_kpis.py`.
+Review of the first version of the report, `legacy/library_analytics.pbix` (November 2026). The model was read with `tools/export_model.py` and every figure of the README was recomputed from the CSVs in `tests/test_kpis.py`.
 
 ## What is right
 
@@ -17,9 +17,9 @@ Review of `library_analytics.pbix` (November 2026). The model was read with `too
 | Top 20 % of books, share of loans | ~44 % | 46.4 % | The measure takes ROUNDUP(72 × 0.2) = 15 books. |
 | Overdue rate, Student / Researcher / Faculty | 24.8 / 15.3 / 14.5 % | 26.1 / 16.7 / 15.8 % | The README divided by all loans, the report divides by closed loans. Open loans always have 0 overdue days, so the report is the right one. |
 
-## Fixes to apply in Power BI Desktop
+## Fixes (applied in the PBIP report)
 
-A `.pbix` cannot be edited outside Desktop, so these changes are listed here with the exact DAX. They take about five minutes. After saving, run `python tools/export_model.py` to refresh `docs/model.md`.
+The report is now generated from `powerbi/build_report.py`, so these fixes are applied in code. `tests/test_powerbi.py` checks that they stay applied.
 
 ### 1. Utilization should be weighted by copies (page 6)
 
@@ -56,12 +56,19 @@ Loans YTD = TOTALYTD ( [Total Loans], DIM_DATE[full_date], "08-31" )
 
 ### 3. Model hygiene
 
-- `Current Reallocation Priority` has no display folder: set it to `06 - Page 6`.
-- Hide the foreign keys of the three facts (`date_id`, `user_id`, `book_id`, `branch_id`, `category_id`). The dimension columns are the ones to use in visuals.
-- `DIM_USER[preferred_branch_id]` is summarized as *Sum*: set it to *Don't summarize*.
-- The `DataFolder` parameter still points to a local path from the course (`...\0_COMMON_MODEL\data_csv`). Set it to the `data` folder of this repository before a refresh, as the README says.
+- `Current Reallocation Priority` gets the `06 - Stock` display folder.
+- Foreign keys and raw numbers of the three facts are hidden: visuals use dimension columns and measures.
+- `DIM_USER[preferred_branch_id]` is hidden and no longer summarized.
+- `DataFolder` defaults to `C:\pbip\library-analytics-data-warehouse\data\` instead of a local path from the course.
+
+### 4. Also changed in the rebuild
+
+- **Top 10 users** chart: the old report filtered the visual; the new measure `Total Loans (Top 10 Users)` returns blank outside the top 10, so the rule is in the model and visible in `docs/model.md`.
+- **Map of cities** replaced by a bar chart: the Azure map needs a tenant setting and shows six cities poorly.
+- **Filter panel** with bookmark buttons replaced by slicers in the header of each page.
+- **Colour theme** (`powerbi/theme.json`): the old report used the default theme.
 
 ## Still to do
 
-- [ ] Apply the fixes above, save, run `python tools/export_model.py`.
-- [ ] Export one screenshot per page to `docs/img/` and show them in the README: a recruiter will not open a `.pbix`.
+- [ ] Open the PBIP in Power BI Desktop, refresh, check the sanity figures, then delete `legacy/`.
+- [ ] Export one screenshot per page to `docs/img/` and show them in the README: a recruiter will not open a Power BI file.

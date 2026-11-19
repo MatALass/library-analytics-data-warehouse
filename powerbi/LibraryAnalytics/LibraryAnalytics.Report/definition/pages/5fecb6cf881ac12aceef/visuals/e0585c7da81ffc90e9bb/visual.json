@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "e0585c7da81ffc90e9bb",
+  "position": {
+    "x": 16.0,
+    "y": 88,
+    "z": 4000,
+    "width": 303.0,
+    "height": 96,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Active Branches"
+                }
+              },
+              "queryRef": "FACT_LOAN.Active Branches",
+              "nativeQueryRef": "Active Branches"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Active Branches'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

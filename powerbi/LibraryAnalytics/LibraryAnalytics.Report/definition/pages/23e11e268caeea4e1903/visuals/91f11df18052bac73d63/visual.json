@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "91f11df18052bac73d63",
+  "position": {
+    "x": 268.0,
+    "y": 88,
+    "z": 6000,
+    "width": 240.0,
+    "height": 96,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Avg Daily Loans"
+                }
+              },
+              "queryRef": "FACT_LOAN.Avg Daily Loans",
+              "nativeQueryRef": "Avg Daily Loans"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Avg Daily Loans'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

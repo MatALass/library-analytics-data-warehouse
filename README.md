@@ -1,8 +1,8 @@
 <div align="center">
 
-# 📚 Library Analytics — Data Warehouse & Power BI
+# 📚 Library Analytics: Data Warehouse & Power BI
 
-**An academic FR/BE library network — a 6-page Power BI dashboard on a fact-constellation star schema, from reproducible synthetic data to a prescriptive stock-reallocation engine.**
+**An academic FR/BE library network, a 6-page Power BI dashboard on a fact-constellation star schema, from reproducible synthetic data to a prescriptive stock-reallocation engine.**
 
 [![Power BI](https://img.shields.io/badge/Power_BI-Desktop-F2C811?logo=powerbi&logoColor=black)](https://powerbi.microsoft.com/)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
@@ -21,7 +21,7 @@
 
 A network of academic libraries across France and Belgium. The project models loans,
 reservations and monthly stock snapshots in a **fact-constellation** warehouse and
-delivers a **6-page Power BI report** answering 12 business questions — culminating in
+delivers a **6-page Power BI report** answering 12 business questions, culminating in
 a **prescriptive reallocation engine** that shows how much unmet demand could be
 covered just by redistributing idle stock, with **no new purchases**.
 
@@ -39,7 +39,11 @@ injected, correlated trends** so every page tells a piece of one coherent story:
 ```
 library-analytics-data-warehouse/
 ├── README.md                     ← you are here (single source of truth)
-├── library_analytics.pbix        ← THE master report (model + 6 pages, data embedded)
+├── powerbi/
+│   ├── build_report.py           ← THE report, described in code (model, 58 measures, 6 pages)
+│   ├── theme.json                colour theme applied to every page
+│   └── LibraryAnalytics/         generated Power BI project (PBIP: TMDL + PBIR), open the .pbip
+├── legacy/library_analytics.pbix first version of the report, kept until the PBIP is validated
 ├── data/                         the 8 English CSVs loaded by the .pbix
 │   ├── DIM_DATE.csv  DIM_BOOK.csv  DIM_BRANCH.csv  DIM_CATEGORY.csv  DIM_USER.csv
 │   └── FACT_LOAN.csv  FACT_RESERVATION.csv  FACT_INVENTORY_SNAPSHOT.csv
@@ -47,23 +51,23 @@ library-analytics-data-warehouse/
 ├── source_dimensions/            hand-authored dimension sources (input to the generator)
 │   └── DIM_DATE.csv  DIM_BOOK.csv  DIM_BRANCH.csv  DIM_CATEGORY.csv  DIM_USER.csv
 ├── docs/
-│   ├── model.md                  all 57 DAX measures and 14 relationships, readable on GitHub
+│   ├── model.md                  all 58 DAX measures and 14 relationships, readable on GitHub
 │   └── model_review.md           review of the model and fixes to apply in Desktop
-├── tools/export_model.py         regenerates docs/model.md from the .pbix
-└── tests/test_kpis.py            every README figure recomputed from the CSVs
+├── tools/export_model.py         regenerates docs/model.md from powerbi/build_report.py
+└── tests/                        README figures recomputed from the CSVs + report consistency
 ```
 
-The `.pbix` opens **standalone** — the data is imported (embedded), so no CSV is needed
-just to view the report. The CSVs and generator are kept for **reproducibility** and to
-support a data **Refresh**.
+The report is **generated from code**: `powerbi/build_report.py` describes the model and
+the pages, and [pbip-generator](https://github.com/MatALass/pbip-generator) writes the
+Power BI project as plain text (TMDL for the model, PBIR for the report). Every measure
+and every visual can be reviewed in a pull request, which a binary `.pbix` does not allow.
 
-All measures live in a dedicated `_Measures` table, organised into per-page display
-folders (`00 - Common Model`, `01 - Page 1` … `06 - Page 6`). The whole model —
-columns, measures, data values — is in **English**.
+Measures sit on the fact table they count, organised into per-page display folders
+(`00 - Common`, `01 - Overview` … `06 - Stock`). The whole model is in **English**.
 
 ---
 
-## 🌌 Architecture — star (constellation) schema
+## 🌌 Architecture: star (constellation) schema
 
 Three fact tables share five conformed dimensions (a *fact constellation*):
 
@@ -75,7 +79,7 @@ Three fact tables share five conformed dimensions (a *fact constellation*):
 
 **Shared dimensions:** `DIM_DATE`, `DIM_BOOK`, `DIM_BRANCH`, `DIM_CATEGORY`, `DIM_USER`.
 
-`DIM_BOOK` holds **book attributes only** — the old inventory columns (`total_copies`,
+`DIM_BOOK` holds **book attributes only**: the old inventory columns (`total_copies`,
 `available_copies`, `utilization_rate`, …) are **facts** and live in
 `FACT_INVENTORY_SNAPSHOT` at the right grain (book × branch × month). Only
 `base_total_copies` is kept on the book as a catalogue allocation attribute.
@@ -122,7 +126,7 @@ Each relationship: **one-to-many (1:\*)**, cross-filter **Single** (dimension fi
 > - **Do NOT create** a `DIM_BOOK → DIM_CATEGORY` relationship. Category joins the facts
 >   directly via `category_id`. Adding a book→category edge creates an ambiguous
 >   (snowflake) path and Power BI silently **deactivates** the three direct
->   fact→category relationships — category visuals then stop filtering.
+>   fact→category relationships, category visuals then stop filtering.
 > - **Mark `DIM_DATE` as a date table** on `full_date` (enables time intelligence:
 >   YoY, MoM, YTD). **Auto date/time is off** to avoid hidden auto date tables.
 > - **CSV encoding = UTF-8 (65001).** The generator writes UTF-8; every Power Query
@@ -138,7 +142,7 @@ Each relationship: **one-to-many (1:\*)**, cross-filter **Single** (dimension fi
 
 ## 📚 Data dictionary
 
-### `FACT_LOAN` — grain: one loan
+### `FACT_LOAN`: grain: one loan
 | Column | Type | Description |
 |---|---|---|
 | `loan_id` | text | Technical loan key. |
@@ -154,7 +158,7 @@ Each relationship: **one-to-many (1:\*)**, cross-filter **Single** (dimension fi
 | `penalty_amount` | decimal | Simulated penalty (€0.30 / overdue day). |
 | `quantity` | int | Quantity loaned (1). |
 
-### `FACT_RESERVATION` — grain: one reservation
+### `FACT_RESERVATION`: grain: one reservation
 | Column | Type | Description |
 |---|---|---|
 | `reservation_id` | text | Technical reservation key. |
@@ -163,7 +167,7 @@ Each relationship: **one-to-many (1:\*)**, cross-filter **Single** (dimension fi
 | `wait_days` | int | Wait before fulfilment / abandonment. |
 | `quantity` | int | Quantity reserved (1). |
 
-### `FACT_INVENTORY_SNAPSHOT` — grain: book × branch × month
+### `FACT_INVENTORY_SNAPSHOT`: grain: book × branch × month
 | Column | Type | Description |
 |---|---|---|
 | `snapshot_id` | text | Technical snapshot key. |
@@ -181,11 +185,11 @@ Each relationship: **one-to-many (1:\*)**, cross-filter **Single** (dimension fi
 | `reallocation_priority` | text | `Critical`, `High`, `Normal`, `Low`. |
 
 ### Dimensions
-- **`DIM_DATE`** — academic calendar (month, quarter, year, exam flag, `academic_period` ∈ {`Back-to-School`, `Exams`, `Off-Exam`, `Summer Break`}). Mark as date table on `full_date`.
-- **`DIM_BOOK`** — title, author, category, academic level, language, `demand_tier` (`top`/`high`/`medium`/`low`), `base_total_copies`, `popularity_score`.
-- **`DIM_CATEGORY`** — category (e.g. `Law`, `Health`, `Data Science & AI`…), subcategory, discipline cluster.
-- **`DIM_BRANCH`** — library, city, country, type (`University`/`School`/`IUT`/`BUT`), coordinates, profile (6 cities: Paris, Lyon, Lille, Marseille, Brussels, Liège).
-- **`DIM_USER`** — user, type (`Student`/`Researcher`/`Faculty`), faculty, level, country, preferred branch.
+- **`DIM_DATE`**: academic calendar (month, quarter, year, exam flag, `academic_period` ∈ {`Back-to-School`, `Exams`, `Off-Exam`, `Summer Break`}). Mark as date table on `full_date`.
+- **`DIM_BOOK`**: title, author, category, academic level, language, `demand_tier` (`top`/`high`/`medium`/`low`), `base_total_copies`, `popularity_score`.
+- **`DIM_CATEGORY`**: category (e.g. `Law`, `Health`, `Data Science & AI`…), subcategory, discipline cluster.
+- **`DIM_BRANCH`**: library, city, country, type (`University`/`School`/`IUT`/`BUT`), coordinates, profile (6 cities: Paris, Lyon, Lille, Marseille, Brussels, Liège).
+- **`DIM_USER`**: user, type (`Student`/`Researcher`/`Faculty`), faculty, level, country, preferred branch.
 
 ---
 
@@ -206,7 +210,7 @@ Trends are injected on purpose and **correlated** (measured on seed 42):
 5. **User segmentation.** Overdue rate by type (overdue / closed loans, as in the report):
    **Student 26.1 %**, Researcher 16.7 %, Faculty 15.8 %. Researchers/faculty borrow
    longer (28 d vs 16 d).
-6. **Stock reallocation — the differentiator.** Tense branches (Paris, Brussels,
+6. **Stock reallocation, the differentiator.** Tense branches (Paris, Brussels,
    Marseille) are **under-allocated** vs demand; calm ones (Lille, Liège) hold **idle
    stock**. Headline (last month): **124 critical pairs**, **353 units of unmet demand**,
    and **~32 % of that gap is coverable by redistributing idle stock alone**.
@@ -232,20 +236,19 @@ Trends are injected on purpose and **correlated** (measured on seed 42):
 ## ✅ Tests
 
 ```powershell
-pip install -r requirements-dev.txt
-pytest -q                          # README figures recomputed from the CSVs
-python tools/export_model.py       # refresh docs/model.md after editing the .pbix
+pip install -r requirements-dev.txt -r powerbi/requirements.txt
+pytest -q                          # README figures + report consistency
 ```
 
 The CI also regenerates the data with `generate_data.py` and checks that it matches
-`data/` byte for byte.
+`data/` byte for byte, and checks that `powerbi/LibraryAnalytics/` is up to date.
 
 ---
 
 ## 🛠️ Data generator
 
 Reproducible (fixed seed). Generates French internally (trend logic), writes **English**
-UTF-8 CSVs straight into `data/`. One file — no separate translation step.
+UTF-8 CSVs straight into `data/`. One file, no separate translation step.
 
 ```powershell
 # run from the repository root
@@ -257,23 +260,38 @@ python generate_data.py --keep-french          # raw FR (debug only)
 
 The script prints sanity checks (16,000 loans · 3,600 reservations · 124 critical pairs ·
 353 unmet · ~32.29 % coverage). Trend dictionaries (demand weights, branch tension,
-exam sensitivity, faculty→category affinity, loan policy) sit at the top of `build()` —
+exam sensitivity, faculty→category affinity, loan policy) sit at the top of `build()` , 
 tweak and rerun. Inputs are read from `source_dimensions/`.
 
 ---
 
-## 🔁 Reproduce the report
+## 🔁 Open the report
 
-1. Open `library_analytics.pbix` in Power BI Desktop (data is embedded — it opens as-is).
-2. If you regenerate data, point the Power Query parameter `DataFolder` at your local
-   `data` folder, then **Refresh** (column names are stable → relationships, types
-   and measures survive).
-3. Verify the sanity figures: `Total Loans` = 16,000 · `Total Reservations` = 3,600 ·
+1. In Power BI Desktop, enable the preview features **Power BI Project (.pbip)**, **TMDL**
+   and **PBIR** (File > Options > Preview features), then restart.
+2. Open `powerbi/LibraryAnalytics/LibraryAnalytics.pbip`.
+3. Set the `DataFolder` parameter (Transform data > Manage parameters) to the `data`
+   folder of this repository, **with the final backslash**, e.g.
+   `D:\repos\library-analytics-data-warehouse\data\`. Or clone the repository to
+   `C:\pbip\library-analytics-data-warehouse\`, the default.
+4. Click **Refresh**: the project opens without data, by design.
+5. Check the sanity figures: `Total Loans` = 16,000 · `Total Reservations` = 3,600 ·
    `Critical Pairs (Last Month)` = 124 · `Reallocation Coverage Rate %` ≈ 32.29 %.
 
-> **Portability:** the CSV source path is a Power Query parameter `DataFolder`. After
-> cloning, set it to the absolute path of this repo's `data` folder (needed only to
-> **Refresh** — not to view the report).
+To share a single file: File > Save as > `.pbix`.
+
+### Change the report
+
+Edit `powerbi/build_report.py` (or `theme.json`), then:
+
+```powershell
+pip install -r powerbi/requirements.txt
+python powerbi/build_report.py
+python tools/export_model.py
+```
+
+Do not edit the files of `powerbi/LibraryAnalytics/` by hand: the CI regenerates the
+project and fails if it differs from the committed one.
 
 ---
 
@@ -281,18 +299,20 @@ tweak and rerun. Inputs are read from `source_dimensions/`.
 
 | Page | Owner | Status |
 |---|---|---|
-| 1 — Overview | Raphaël | ✅ built (EN) |
-| 2 — Time & exams | Raphaël | ✅ built (EN) |
-| 3 — Network & branches | Samuel | ✅ built (EN) |
-| 4 — Users & overdue | Samuel | ✅ built (EN) |
-| 5 — Catalogue & demand | Mathieu | ✅ built (EN) |
-| 6 — Stock & reallocation | Mathieu | ✅ built (EN) |
+| 1, Overview | Raphaël | ✅ built (EN) |
+| 2, Time & exams | Raphaël | ✅ built (EN) |
+| 3, Network & branches | Samuel | ✅ built (EN) |
+| 4, Users & overdue | Samuel | ✅ built (EN) |
+| 5, Catalogue & demand | Mathieu | ✅ built (EN) |
+| 6, Stock & reallocation | Mathieu | ✅ built (EN) |
 
 **Status: complete.** All 6 pages built, titles harmonised in English, the 12 questions
-covered, and figures validated against the generator's sanity checks.
+covered, and figures validated against the generator's sanity checks. Since November 2026
+the report is generated from code (PBIP) with a colour theme, and the fixes of
+[docs/model_review.md](docs/model_review.md) are applied.
 
 ---
 
 <div align="center">
-<sub>Academic project · EFREI Paris — Panthéon-Assas · Business Intelligence & Analytics</sub>
+<sub>Academic project · EFREI Paris, Panthéon-Assas · Business Intelligence & Analytics</sub>
 </div>

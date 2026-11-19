@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "19567bddde894c0e0bf7",
+  "position": {
+    "x": 870.64,
+    "y": 456.0,
+    "z": 12000,
+    "width": 393.36,
+    "height": 248.0,
+    "tabOrder": 12000
+  },
+  "visual": {
+    "visualType": "gauge",
+    "query": {
+      "queryState": {
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Weekend Loans %"
+                }
+              },
+              "queryRef": "FACT_LOAN.Weekend Loans %",
+              "nativeQueryRef": "Weekend Loans %"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Weekend Loans Share'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

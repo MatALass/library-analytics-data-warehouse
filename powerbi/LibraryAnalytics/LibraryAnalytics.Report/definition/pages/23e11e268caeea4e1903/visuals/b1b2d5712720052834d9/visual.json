@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "b1b2d5712720052834d9",
+  "position": {
+    "x": 1024.0,
+    "y": 88,
+    "z": 9000,
+    "width": 240.0,
+    "height": 96,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Loans YTD"
+                }
+              },
+              "queryRef": "FACT_LOAN.Loans YTD",
+              "nativeQueryRef": "Loans YTD"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Loans YTD'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,87 @@
+table DIM_BRANCH
+	lineageTag: 67613150-b510-5174-8801-6610ec631ee8
+
+	column branch_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 7600ee50-f3d8-51ed-85bd-ad2c3f5f3793
+		summarizeBy: none
+		sourceColumn: branch_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column branch_name
+		dataType: string
+		lineageTag: aaaaf76a-3002-5930-8cc9-a73421cd2d20
+		summarizeBy: none
+		sourceColumn: branch_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column city
+		dataType: string
+		lineageTag: b8e03f40-5dbc-518a-96fb-c8b982dacdd1
+		summarizeBy: none
+		sourceColumn: city
+
+		annotation SummarizationSetBy = Automatic
+
+	column country
+		dataType: string
+		lineageTag: d0bca909-f11a-56b9-9bc6-7649f6efbac7
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	column branch_type
+		dataType: string
+		lineageTag: 5e143ed1-039c-5dff-81ef-3ba775710d30
+		summarizeBy: none
+		sourceColumn: branch_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column department
+		dataType: string
+		lineageTag: 60905561-7cf9-52bd-8c11-6b3f6e7dfa80
+		summarizeBy: none
+		sourceColumn: department
+
+		annotation SummarizationSetBy = Automatic
+
+	column latitude
+		dataType: double
+		lineageTag: 31bed318-fb1a-51f8-bf7e-bb4b95890caf
+		summarizeBy: none
+		sourceColumn: latitude
+
+		annotation SummarizationSetBy = Automatic
+
+	column longitude
+		dataType: double
+		lineageTag: 90321fa0-ca8c-5e06-8947-03586ce34916
+		summarizeBy: none
+		sourceColumn: longitude
+
+		annotation SummarizationSetBy = Automatic
+
+	column branch_profile
+		dataType: string
+		lineageTag: 544cbe4f-a990-54ec-ae45-a4871876c462
+		summarizeBy: none
+		sourceColumn: branch_profile
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DIM_BRANCH = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "DIM_BRANCH.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"branch_id", Int64.Type}, {"branch_name", type text}, {"city", type text}, {"country", type text}, {"branch_type", type text}, {"department", type text}, {"latitude", type number}, {"longitude", type number}, {"branch_profile", type text}}, "en-US")
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table

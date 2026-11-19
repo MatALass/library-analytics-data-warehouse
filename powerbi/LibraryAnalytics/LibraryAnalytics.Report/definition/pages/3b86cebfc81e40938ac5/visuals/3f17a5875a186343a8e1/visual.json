@@ -1,0 +1,110 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "3f17a5875a186343a8e1",
+  "position": {
+    "x": 16,
+    "y": 196,
+    "z": 9000,
+    "width": 618.0,
+    "height": 248.0,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_CATEGORY"
+                    }
+                  },
+                  "Property": "category"
+                }
+              },
+              "queryRef": "DIM_CATEGORY.category",
+              "nativeQueryRef": "category"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Daily Loans (Exam Period)"
+                }
+              },
+              "queryRef": "FACT_LOAN.Daily Loans (Exam Period)",
+              "nativeQueryRef": "Daily Loans (Exam Period)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Daily Loans (Off-Exam)"
+                }
+              },
+              "queryRef": "FACT_LOAN.Daily Loans (Off-Exam)",
+              "nativeQueryRef": "Daily Loans (Off-Exam)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "FACT_LOAN"
+                  }
+                },
+                "Property": "Daily Loans (Exam Period)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Daily Loans by Category: Exam vs Off-Exam'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,4 @@
+expression DataFolder = "C:\pbip\library-analytics-data-warehouse\data\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 54faab48-903e-5ba2-b2cc-6f20e5918d04
+
+	annotation PBI_ResultType = Text

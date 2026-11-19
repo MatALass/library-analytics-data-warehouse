@@ -1,0 +1,55 @@
+relationship da6362dc-1636-573c-97d7-3c735ac4591b
+	fromColumn: FACT_LOAN.date_id
+	toColumn: DIM_DATE.date_id
+
+relationship 52cd0e35-4d69-56b0-a925-537d9bfee151
+	fromColumn: FACT_LOAN.user_id
+	toColumn: DIM_USER.user_id
+
+relationship 3d8fd56b-10c5-5dc8-94e4-49b259515f07
+	fromColumn: FACT_LOAN.book_id
+	toColumn: DIM_BOOK.book_id
+
+relationship 4678104f-8246-5738-8e37-2a4519374c9a
+	fromColumn: FACT_LOAN.branch_id
+	toColumn: DIM_BRANCH.branch_id
+
+relationship be12cece-0645-5ad8-92f5-745ab3499bc3
+	fromColumn: FACT_LOAN.category_id
+	toColumn: DIM_CATEGORY.category_id
+
+relationship 7d182b83-b5ff-5cc4-bf30-9fdb12683b28
+	fromColumn: FACT_RESERVATION.date_id
+	toColumn: DIM_DATE.date_id
+
+relationship 3ffe9e7c-ac3e-5293-9d63-2f5971728737
+	fromColumn: FACT_RESERVATION.user_id
+	toColumn: DIM_USER.user_id
+
+relationship 3780d56a-2e29-539e-9c89-c90837573d84
+	fromColumn: FACT_RESERVATION.book_id
+	toColumn: DIM_BOOK.book_id
+
+relationship cf281589-a0f4-5f04-9845-e343a8f80869
+	fromColumn: FACT_RESERVATION.branch_id
+	toColumn: DIM_BRANCH.branch_id
+
+relationship 56f398c3-9f66-5993-b865-e4b76829f61f
+	fromColumn: FACT_RESERVATION.category_id
+	toColumn: DIM_CATEGORY.category_id
+
+relationship 09c4d4e6-29bb-506f-9ac4-fe951bda8dca
+	fromColumn: FACT_INVENTORY_SNAPSHOT.date_id
+	toColumn: DIM_DATE.date_id
+
+relationship 62be1309-3bb2-5a5e-890f-7f451dd61f34
+	fromColumn: FACT_INVENTORY_SNAPSHOT.book_id
+	toColumn: DIM_BOOK.book_id
+
+relationship bb9088e7-d529-52d1-97e0-2c6f8a4b9b82
+	fromColumn: FACT_INVENTORY_SNAPSHOT.branch_id
+	toColumn: DIM_BRANCH.branch_id
+
+relationship 3ec170d1-7b21-5c4d-94d7-cdc232f2babb
+	fromColumn: FACT_INVENTORY_SNAPSHOT.category_id
+	toColumn: DIM_CATEGORY.category_id

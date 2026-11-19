@@ -1,0 +1,96 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "87b8bf0ee04ea127d99f",
+  "position": {
+    "x": 646.0,
+    "y": 466.16,
+    "z": 13000,
+    "width": 618.0,
+    "height": 237.84,
+    "tabOrder": 13000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_USER"
+                    }
+                  },
+                  "Property": "full_name"
+                }
+              },
+              "queryRef": "DIM_USER.full_name",
+              "nativeQueryRef": "full_name"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Total Loans (Top 10 Users)"
+                }
+              },
+              "queryRef": "FACT_LOAN.Total Loans (Top 10 Users)",
+              "nativeQueryRef": "Total Loans (Top 10 Users)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "FACT_LOAN"
+                  }
+                },
+                "Property": "Total Loans (Top 10 Users)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Top 10 Users by Loans'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

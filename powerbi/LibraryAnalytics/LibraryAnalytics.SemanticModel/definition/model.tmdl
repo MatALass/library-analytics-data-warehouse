@@ -1,0 +1,20 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["DataFolder", "DIM_DATE", "DIM_BOOK", "DIM_BRANCH", "DIM_CATEGORY", "DIM_USER", "FACT_LOAN", "FACT_RESERVATION", "FACT_INVENTORY_SNAPSHOT"]
+
+ref table DIM_DATE
+ref table DIM_BOOK
+ref table DIM_BRANCH
+ref table DIM_CATEGORY
+ref table DIM_USER
+ref table FACT_LOAN
+ref table FACT_RESERVATION
+ref table FACT_INVENTORY_SNAPSHOT

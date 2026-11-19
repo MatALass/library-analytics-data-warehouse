@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "2ada6c39bca3699177f7",
+  "position": {
+    "x": 268.0,
+    "y": 88,
+    "z": 5000,
+    "width": 240.0,
+    "height": 96,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FACT_LOAN"
+                    }
+                  },
+                  "Property": "Loans (Off-Exam)"
+                }
+              },
+              "queryRef": "FACT_LOAN.Loans (Off-Exam)",
+              "nativeQueryRef": "Loans (Off-Exam)"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Loans (Off-Exam)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
