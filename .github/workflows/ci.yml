@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    name: Data reproducible and README figures
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt pytest
+      - name: Generator rebuilds data/ byte for byte
+        run: |
+          python generate_data.py --out /tmp/regen
+          for f in data/*.csv; do cmp "$f" "/tmp/regen/$(basename "$f")"; done
+      - run: pytest -q
