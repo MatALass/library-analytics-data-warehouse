@@ -1,5 +1,5 @@
 # Generates powerbi/LibraryAnalytics (python powerbi/build_report.py).
-# Pinned to the commit that adds themes, CSV date tables and textboxes
-# (MatALass/pbip-generator PR #2). Move the pin to main once it is merged.
-pbip-generator @ git+https://github.com/MatALass/pbip-generator@906e6f17eb5c4b2b6aa2ee4717555ff3fe28d74a
+# Pinned to the main commit that adds themes, CSV date tables and textboxes
+# (MatALass/pbip-generator PR #2, merged).
+pbip-generator @ git+https://github.com/MatALass/pbip-generator@23066d66dd4018b9bc49d62f1ce22c094fe67d91
 pandas>=2.0
